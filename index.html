@@ -21,71 +21,56 @@
     }
 
     .app-header {
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      width: 100%; max-width: 400px;
+      display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 20px;
     }
     .app-logo { font-size: 11px; letter-spacing: 2px; color: #4b5563; text-transform: uppercase; }
-    .app-time { font-size: 13px; color: #6b7280; font-variant-numeric: tabular-nums; }
+    .app-time  { font-size: 13px; color: #6b7280; font-variant-numeric: tabular-nums; }
 
     .card {
-      background: #16162a;
-      border: 1px solid #252540;
-      border-radius: 16px;
-      padding: 20px;
-      width: 100%;
-      max-width: 400px;
-      margin-bottom: 12px;
+      background: #16162a; border: 1px solid #252540; border-radius: 16px;
+      padding: 20px; width: 100%; max-width: 400px; margin-bottom: 12px;
     }
     .card-label {
-      font-size: 10px;
-      letter-spacing: 1.8px;
-      color: #4b5563;
-      text-transform: uppercase;
-      margin-bottom: 12px;
+      font-size: 10px; letter-spacing: 1.8px; color: #4b5563;
+      text-transform: uppercase; margin-bottom: 12px;
     }
+
+    /* ── Checklist ── */
+    .checklist { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .check-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px; color: #4b5563; transition: color 0.2s;
+    }
+    .check-item.ok { color: #22c55e; }
+    .check-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #252540; flex-shrink: 0; transition: background 0.2s;
+    }
+    .check-item.ok .check-dot { background: #22c55e; }
 
     /* ── Selector de empleado ── */
     .search-wrapper { position: relative; }
     .search-input {
-      width: 100%;
-      padding: 13px 16px;
-      background: #0f0f1a;
-      border: 1px solid #252540;
-      border-radius: 10px;
-      color: #e8e8f0;
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
+      width: 100%; padding: 13px 16px;
+      background: #0f0f1a; border: 1px solid #252540; border-radius: 10px;
+      color: #e8e8f0; font-size: 16px; outline: none;
+      transition: border-color 0.2s; -webkit-appearance: none;
     }
     .search-input:focus { border-color: #6366f1; }
     .search-input::placeholder { color: #374151; }
 
     .dropdown {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0; right: 0;
-      background: #1e1e38;
-      border: 1px solid #252540;
-      border-radius: 10px;
-      max-height: 210px;
-      overflow-y: auto;
-      z-index: 200;
-      display: none;
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: #1e1e38; border: 1px solid #252540; border-radius: 10px;
+      max-height: 210px; overflow-y: auto; z-index: 200; display: none;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
     .dropdown.open { display: block; }
     .dropdown-item {
-      padding: 12px 16px;
-      cursor: pointer;
-      font-size: 14px;
-      border-bottom: 1px solid #1a1a30;
-      transition: background 0.12s;
-      line-height: 1.4;
+      padding: 12px 16px; cursor: pointer; font-size: 14px;
+      border-bottom: 1px solid #1a1a30; transition: background 0.12s; line-height: 1.4;
     }
     .dropdown-item:last-child { border-bottom: none; }
     .dropdown-item:hover { background: #252545; }
@@ -93,197 +78,217 @@
     .dropdown-empty { padding: 16px; text-align: center; color: #4b5563; font-size: 13px; }
 
     .empleado-confirmado {
-      display: none;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: #0f0f1a;
-      border: 1px solid #1e3a1e;
-      border-radius: 10px;
-      margin-top: 10px;
+      display: none; align-items: center; gap: 12px;
+      padding: 12px 16px; background: #0f0f1a;
+      border: 1px solid #1e3a1e; border-radius: 10px; margin-top: 10px;
     }
     .empleado-confirmado.visible { display: flex; }
-    .empleado-confirmado .emp-nombre { font-size: 15px; font-weight: 500; color: #e8e8f0; }
-    .empleado-confirmado .emp-id-small { font-size: 11px; color: #4b5563; }
-    .check-emp { width: 20px; height: 20px; background: #166534; border-radius: 50%;
-                 display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .emp-nombre    { font-size: 15px; font-weight: 500; color: #e8e8f0; }
+    .emp-id-small  { font-size: 11px; color: #4b5563; }
+    .check-emp {
+      width: 20px; height: 20px; background: #166534; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
     .check-emp svg { width: 11px; height: 11px; }
     .btn-cambiar {
-      margin-left: auto;
-      background: none;
-      border: none;
-      color: #6b7280;
-      font-size: 12px;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 6px;
+      margin-left: auto; background: none; border: none;
+      color: #6b7280; font-size: 12px; cursor: pointer;
+      padding: 4px 8px; border-radius: 6px;
     }
     .btn-cambiar:hover { background: #252540; color: #e8e8f0; }
 
-    /* ── Selector de turno ── */
+    /* ── Turno ── */
     .turno-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .btn-turno {
-      padding: 14px 10px;
-      background: #0f0f1a;
-      border: 1.5px solid #252540;
-      border-radius: 10px;
-      color: #6b7280;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
-      text-align: center;
-      line-height: 1.3;
+      padding: 14px 10px; background: #0f0f1a;
+      border: 1.5px solid #252540; border-radius: 10px;
+      color: #6b7280; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s; text-align: center; line-height: 1.3;
     }
     .btn-turno .turno-horas { font-size: 11px; color: #374151; margin-top: 3px; }
-    .btn-turno.selected {
-      background: #1e1e40;
-      border-color: #6366f1;
-      color: #a5b4fc;
-    }
+    .btn-turno.selected { background: #1e1e40; border-color: #6366f1; color: #a5b4fc; }
     .btn-turno.selected .turno-horas { color: #6366f1; }
 
-    /* ── Edificio detectado ── */
+    /* ── Edificio ── */
     .edificio-badge {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 13px 16px;
-      background: #0f0f1a;
-      border: 1px solid #252540;
-      border-radius: 10px;
-      font-size: 14px;
-      min-height: 50px;
-      transition: border-color 0.3s;
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 16px; background: #0f0f1a;
+      border: 1px solid #252540; border-radius: 10px;
+      font-size: 14px; min-height: 56px; transition: border-color 0.3s;
     }
     .edificio-badge.detectado { border-color: #166534; }
     .edificio-badge.fuera     { border-color: #7f1d1d; }
     .edificio-badge.cargando  { border-color: #252540; }
-
     .gps-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: #374151;
-      flex-shrink: 0;
-      transition: background 0.3s;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #374151; flex-shrink: 0; transition: background 0.3s;
     }
     .edificio-badge.detectado .gps-dot { background: #22c55e; }
-    .edificio-badge.fuera .gps-dot     { background: #ef4444; }
-    .edificio-badge.cargando .gps-dot  { background: #f59e0b; animation: pulse 1.2s infinite; }
-
+    .edificio-badge.fuera     .gps-dot { background: #ef4444; }
+    .edificio-badge.cargando  .gps-dot { background: #f59e0b; animation: pulse 1.2s infinite; }
     .edificio-info { flex: 1; }
     .edificio-nombre { font-size: 14px; color: #e8e8f0; }
     .edificio-sub    { font-size: 11px; color: #4b5563; margin-top: 2px; }
-
-    .gps-precision { font-size: 11px; color: #374151; white-space: nowrap; }
-
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    .gps-precision   { font-size: 11px; color: #374151; white-space: nowrap; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
 
     /* ── Cámara ── */
     .camara-wrapper {
-      position: relative;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #0a0a14;
-      aspect-ratio: 4/3;
+      position: relative; border-radius: 10px; overflow: hidden;
+      background: #0a0a14; aspect-ratio: 4/3;
     }
-    #video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scaleX(-1);
-      display: block;
-    }
+    #video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); display:block; }
     .camara-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(10,10,20,0.7);
-      font-size: 13px;
-      color: #6b7280;
-      text-align: center;
-      padding: 20px;
+      position: absolute; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      background: rgba(10,10,20,0.85); font-size: 13px;
+      color: #6b7280; text-align: center; padding: 20px; line-height: 1.6;
     }
     .camara-overlay.oculto { display: none; }
-
-    /* Guía de encuadre */
     .face-guide {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -55%);
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-55%);
       width: 110px; height: 130px;
       border: 2px solid rgba(99,102,241,0.4);
-      border-radius: 55px / 65px;
-      pointer-events: none;
+      border-radius: 55px / 65px; pointer-events: none;
     }
 
     /* ── Botones de evento ── */
-    .eventos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .eventos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
     .btn-evento {
-      padding: 18px 10px;
-      border: none;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
+      padding: 18px 10px; border: none; border-radius: 12px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
       transition: opacity 0.2s, transform 0.1s;
-      letter-spacing: 0.3px;
-      line-height: 1.3;
+      letter-spacing: 0.3px; line-height: 1.3;
     }
     .btn-evento .evento-hora { font-size: 10px; font-weight: 400; opacity: 0.7; display: block; margin-top: 3px; }
-    .btn-evento:active { transform: scale(0.96); }
-    .btn-evento:disabled { opacity: 0.25; cursor: not-allowed; transform: none; }
-    .btn-entrada  { background: #22c55e; color: #052e16; }
-    .btn-ini-com  { background: #f59e0b; color: #1c0a00; }
-    .btn-fin-com  { background: #3b82f6; color: #e0f0ff; }
-    .btn-salida   { background: #ef4444; color: #fff0f0; }
+    .btn-evento:active:not(:disabled) { transform: scale(0.96); }
+    .btn-evento:disabled { opacity: 0.2; cursor: not-allowed; }
+    .btn-entrada { background: #22c55e; color: #052e16; }
+    .btn-ini-com { background: #f59e0b; color: #1c0a00; }
+    .btn-fin-com { background: #3b82f6; color: #e0f0ff; }
+    .btn-salida  { background: #ef4444; color: #fff0f0; }
 
-    /* ── Estado / feedback ── */
+    /* ── Estado ── */
     #estado {
-      margin-top: 12px;
-      padding: 14px 16px;
-      border-radius: 10px;
-      font-size: 14px;
-      text-align: center;
-      min-height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0f0f1a;
-      border: 1px solid #252540;
-      color: #6b7280;
-      line-height: 1.4;
-      transition: color 0.2s, border-color 0.2s;
+      padding: 14px 16px; border-radius: 10px; font-size: 14px;
+      text-align: center; min-height: 50px; display: flex;
+      align-items: center; justify-content: center;
+      background: #0f0f1a; border: 1px solid #252540;
+      color: #6b7280; line-height: 1.5; transition: color 0.2s, border-color 0.2s;
     }
-    #estado.ok       { color: #22c55e; border-color: #166534; }
-    #estado.error    { color: #ef4444; border-color: #7f1d1d; }
-    #estado.cargando { color: #6366f1; border-color: #312e81; }
+    #estado.ok      { color: #22c55e; border-color: #166534; }
+    #estado.error   { color: #ef4444; border-color: #7f1d1d; }
+    #estado.cargando{ color: #6366f1; border-color: #312e81; }
+    #estado.aviso   { color: #f59e0b; border-color: #78350f; }
 
-    /* ── Offline ── */
+    /* ── Aviso catálogos ── */
+    #card-aviso-catalogo { display: none; }
+    .catalogo-aviso {
+      padding: 12px 14px; background: #1c1000;
+      border: 1px solid #78350f; border-radius: 10px;
+      font-size: 13px; color: #fbbf24; line-height: 1.6;
+    }
+    .btn-reintentar {
+      display: inline-block; margin-top: 10px; padding: 8px 16px;
+      background: #78350f; border: none; border-radius: 8px;
+      color: #fbbf24; font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ── Offline bar ── */
     #offline-bar {
-      width: 100%;
-      max-width: 400px;
-      background: #1c1200;
-      border: 1px solid #78350f;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 12px;
-      color: #fbbf24;
-      text-align: center;
-      margin-bottom: 12px;
-      display: none;
+      width: 100%; max-width: 400px; background: #1c1200;
+      border: 1px solid #78350f; border-radius: 10px;
+      padding: 10px 14px; font-size: 12px; color: #fbbf24;
+      text-align: center; margin-bottom: 12px; display: none;
     }
     #offline-bar.visible { display: block; }
 
-    /* ── Registro múltiple en el mismo día ── */
     .multi-turno-hint {
-      font-size: 11px;
-      color: #4b5563;
-      text-align: center;
-      margin-top: 10px;
-      line-height: 1.5;
+      font-size: 11px; color: #374151; text-align: center;
+      margin-top: 10px; line-height: 1.5;
+    }
+
+    /* ══════════════════════════════════════════════
+       MODAL DE CONFIRMACIÓN
+    ══════════════════════════════════════════════ */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(5, 5, 15, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 500;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-backdrop.visible {
+      opacity: 1; pointer-events: all;
+    }
+    .modal {
+      background: #1e1e38; border: 1px solid #2d2d50;
+      border-radius: 20px; padding: 24px;
+      width: 100%; max-width: 400px;
+      transform: translateY(30px);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-backdrop.visible .modal {
+      transform: translateY(0);
+    }
+
+    .modal-titulo {
+      font-size: 11px; letter-spacing: 1.8px; color: #4b5563;
+      text-transform: uppercase; margin-bottom: 16px;
+    }
+
+    /* Badge del evento seleccionado */
+    .modal-evento-badge {
+      display: flex; align-items: center; justify-content: center;
+      padding: 18px; border-radius: 14px; margin-bottom: 16px;
+      font-size: 20px; font-weight: 700; letter-spacing: 0.3px;
+      gap: 10px;
+    }
+    .modal-evento-badge.entrada  { background: #052e16; color: #22c55e; border: 1.5px solid #166534; }
+    .modal-evento-badge.ini-com  { background: #1c0a00; color: #f59e0b; border: 1.5px solid #92400e; }
+    .modal-evento-badge.fin-com  { background: #0c1a2e; color: #3b82f6; border: 1.5px solid #1d4ed8; }
+    .modal-evento-badge.salida   { background: #1c0505; color: #ef4444; border: 1.5px solid #991b1b; }
+
+    /* Resumen del registro */
+    .modal-resumen {
+      background: #0f0f1a; border: 1px solid #252540;
+      border-radius: 12px; padding: 14px 16px;
+      margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .resumen-fila {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px;
+    }
+    .resumen-label { color: #4b5563; font-size: 11px; }
+    .resumen-valor { color: #e8e8f0; font-weight: 500; text-align: right; max-width: 220px; }
+
+    /* Botones del modal */
+    .modal-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn-modal-cancelar {
+      padding: 15px; border: 1.5px solid #252540; border-radius: 12px;
+      background: transparent; color: #6b7280; font-size: 15px;
+      font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-modal-cancelar:hover { background: #252540; color: #e8e8f0; }
+    .btn-modal-confirmar {
+      padding: 15px; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn-modal-confirmar:active { transform: scale(0.97); }
+    .btn-modal-confirmar.entrada { background: #22c55e; color: #052e16; }
+    .btn-modal-confirmar.ini-com { background: #f59e0b; color: #1c0a00; }
+    .btn-modal-confirmar.fin-com { background: #3b82f6; color: #e0f0ff; }
+    .btn-modal-confirmar.salida  { background: #ef4444; color: #fff0f0; }
+    .btn-modal-confirmar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .modal-advertencia {
+      font-size: 11px; color: #4b5563; text-align: center;
+      margin-top: 12px; line-height: 1.5;
     }
   </style>
 </head>
@@ -294,21 +299,26 @@
   <span class="app-time" id="reloj"></span>
 </div>
 
-<!-- Offline bar -->
 <div id="offline-bar">⚠ Sin conexión — el registro se enviará cuando recuperes señal</div>
+
+<!-- ── Aviso si catálogos no cargan ── -->
+<div class="card" id="card-aviso-catalogo">
+  <div class="catalogo-aviso">
+    ⚠ No se pudo conectar al servidor para cargar los catálogos.<br><br>
+    Verifica que la URL de Apps Script esté correctamente configurada en el código
+    y que el deployment esté publicado como <strong>"Cualquiera tiene acceso"</strong>.
+    <br>
+    <button class="btn-reintentar" onclick="reintentarCatalogos()">↺ Reintentar conexión</button>
+  </div>
+</div>
 
 <!-- ── 1. Empleado ── -->
 <div class="card">
   <p class="card-label">¿Quién eres?</p>
   <div class="search-wrapper" id="search-wrapper">
-    <input
-      type="text"
-      id="busqueda"
-      class="search-input"
+    <input type="text" id="busqueda" class="search-input"
       placeholder="Busca tu nombre o número de empleado..."
-      autocomplete="off"
-      spellcheck="false"
-    >
+      autocomplete="off" spellcheck="false">
     <div id="dropdown" class="dropdown"></div>
   </div>
   <div class="empleado-confirmado" id="empleado-confirmado">
@@ -318,7 +328,7 @@
       </svg>
     </div>
     <div>
-      <div class="emp-nombre" id="emp-nombre-display"></div>
+      <div class="emp-nombre"   id="emp-nombre-display"></div>
       <div class="emp-id-small" id="emp-id-display"></div>
     </div>
     <button class="btn-cambiar" onclick="resetEmpleado()">Cambiar</button>
@@ -326,16 +336,14 @@
 </div>
 
 <!-- ── 2. Turno ── -->
-<div class="card" id="card-turno">
+<div class="card">
   <p class="card-label">Turno de este registro</p>
   <div class="turno-grid">
     <button class="btn-turno" id="btn-mat" onclick="seleccionarTurno('Matutino')">
-      Matutino
-      <div class="turno-horas">7:00 – 15:00</div>
+      Matutino<div class="turno-horas">7:00 – 15:00</div>
     </button>
     <button class="btn-turno" id="btn-ves" onclick="seleccionarTurno('Vespertino')">
-      Vespertino
-      <div class="turno-horas">14:00 – 22:00</div>
+      Vespertino<div class="turno-horas">14:00 – 22:00</div>
     </button>
   </div>
 </div>
@@ -347,7 +355,7 @@
     <span class="gps-dot"></span>
     <div class="edificio-info">
       <div class="edificio-nombre" id="edificio-nombre">Detectando GPS...</div>
-      <div class="edificio-sub"   id="edificio-sub"></div>
+      <div class="edificio-sub"   id="edificio-sub">Mantén la app abierta unos segundos</div>
     </div>
     <span class="gps-precision" id="gps-precision"></span>
   </div>
@@ -359,35 +367,86 @@
   <div class="camara-wrapper">
     <video id="video" autoplay playsinline muted></video>
     <div class="face-guide"></div>
-    <div class="camara-overlay" id="camara-overlay">
-      Iniciando cámara frontal...
-    </div>
+    <div class="camara-overlay" id="camara-overlay">Iniciando cámara frontal...</div>
   </div>
 </div>
 
 <!-- ── 5. Registrar ── -->
 <div class="card">
   <p class="card-label">Registrar evento</p>
+  <div class="checklist">
+    <div class="check-item" id="chk-empleado"><span class="check-dot"></span>Empleado seleccionado</div>
+    <div class="check-item" id="chk-turno">   <span class="check-dot"></span>Turno elegido</div>
+    <div class="check-item" id="chk-gps">     <span class="check-dot"></span>Dentro del área de trabajo</div>
+    <div class="check-item" id="chk-camara">  <span class="check-dot"></span>Cámara activa</div>
+  </div>
   <div class="eventos-grid">
-    <button class="btn-evento btn-entrada"  id="btn-entrada"  onclick="registrar('Entrada')"       disabled>
-      Entrada
-      <span class="evento-hora" id="hint-entrada"></span>
+    <button class="btn-evento btn-entrada" id="btn-entrada" onclick="pedirConfirmacion('Entrada')"       disabled>
+      Entrada<span class="evento-hora" id="hint-entrada"></span>
     </button>
-    <button class="btn-evento btn-ini-com"  id="btn-ini-com"  onclick="registrar('Inicio Comida')" disabled>
+    <button class="btn-evento btn-ini-com" id="btn-ini-com" onclick="pedirConfirmacion('Inicio Comida')" disabled>
       Inicio comida
     </button>
-    <button class="btn-evento btn-fin-com"  id="btn-fin-com"  onclick="registrar('Fin Comida')"    disabled>
+    <button class="btn-evento btn-fin-com" id="btn-fin-com" onclick="pedirConfirmacion('Fin Comida')"    disabled>
       Fin comida
     </button>
-    <button class="btn-evento btn-salida"   id="btn-salida"   onclick="registrar('Salida')"        disabled>
-      Salida
-      <span class="evento-hora" id="hint-salida"></span>
+    <button class="btn-evento btn-salida"  id="btn-salida"  onclick="pedirConfirmacion('Salida')"        disabled>
+      Salida<span class="evento-hora" id="hint-salida"></span>
     </button>
   </div>
-  <div id="estado">Completa los pasos anteriores para habilitar el registro.</div>
+  <div id="estado">Completa los pasos de arriba para habilitar el registro.</div>
   <p class="multi-turno-hint">
     Si trabajas en más de un turno o edificio hoy,<br>haz un registro separado por cada uno.
   </p>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL DE CONFIRMACIÓN
+══════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="cerrarModalSiFondo(event)">
+  <div class="modal">
+    <p class="modal-titulo">Confirma tu registro</p>
+
+    <!-- Badge del evento -->
+    <div class="modal-evento-badge" id="modal-evento-badge">
+      <span id="modal-evento-icono"></span>
+      <span id="modal-evento-texto"></span>
+    </div>
+
+    <!-- Resumen -->
+    <div class="modal-resumen">
+      <div class="resumen-fila">
+        <span class="resumen-label">Empleado</span>
+        <span class="resumen-valor" id="modal-empleado"></span>
+      </div>
+      <div class="resumen-fila">
+        <span class="resumen-label">Turno</span>
+        <span class="resumen-valor" id="modal-turno"></span>
+      </div>
+      <div class="resumen-fila">
+        <span class="resumen-label">Edificio</span>
+        <span class="resumen-valor" id="modal-edificio"></span>
+      </div>
+      <div class="resumen-fila">
+        <span class="resumen-label">Hora</span>
+        <span class="resumen-valor" id="modal-hora"></span>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="modal-botones">
+      <button class="btn-modal-cancelar" id="btn-modal-cancelar" onclick="cerrarModal()">
+        Cancelar
+      </button>
+      <button class="btn-modal-confirmar" id="btn-modal-confirmar" onclick="confirmarRegistro()">
+        Confirmar
+      </button>
+    </div>
+
+    <p class="modal-advertencia">
+      El registro usa la hora del servidor y no puede modificarse una vez enviado.
+    </p>
+  </div>
 </div>
 
 <input type="hidden" id="id_empleado">
@@ -396,27 +455,31 @@
 
 <script>
 // ══════════════════════════════════════════════════════════════
-// CONFIGURACIÓN
+// ⚠ ÚNICA LÍNEA QUE DEBES EDITAR:
+const API_URL = "https://script.google.com/macros/s/AKfycbz5T06Jz794u-xXpeRKNtC-Qqw0bHCSvxP2hcMjAvrUXUL_Ne8gy39yQ3vnz4FwEEzP8A/exec";
 // ══════════════════════════════════════════════════════════════
-const API_URL = "https://simulworld.github.io/asistencia-app";
 
-// Horarios locales (solo para UX — la validación real es en el servidor)
 const TURNOS_UX = {
   "Matutino":   { entrada: "7:00",  salida: "15:00" },
   "Vespertino": { entrada: "14:00", salida: "22:00" }
 };
 
-// ══════════════════════════════════════════════════════════════
-// ESTADO
-// ══════════════════════════════════════════════════════════════
-let empleados          = [];
-let edificios          = [];
+const EVENTOS_CONFIG = {
+  "Entrada":       { clase: "entrada", icono: "🟢", etiqueta: "Entrada"       },
+  "Inicio Comida": { clase: "ini-com", icono: "🟡", etiqueta: "Inicio comida" },
+  "Fin Comida":    { clase: "fin-com", icono: "🔵", etiqueta: "Fin comida"    },
+  "Salida":        { clase: "salida",  icono: "🔴", etiqueta: "Salida"        }
+};
+
+let empleados            = [];
+let edificios            = [];
 let empleadoSeleccionado = null;
 let turnoSeleccionado    = null;
 let edificioDetectado    = null;
-let gpsActual            = null;  // { lat, lon, precision }
+let gpsActual            = null;
 let camaraLista          = false;
 let enviando             = false;
+let eventoEnEspera       = null; // el evento que el empleado tocó, esperando confirmación
 
 // ══════════════════════════════════════════════════════════════
 // INIT
@@ -433,50 +496,75 @@ async function inicializar() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// RELOJ EN TIEMPO REAL
+// RELOJ
 // ══════════════════════════════════════════════════════════════
 function iniciarReloj() {
   function tick() {
-    const ahora = new Date();
     document.getElementById("reloj").textContent =
-      ahora.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+    // Actualiza la hora en el modal si está abierto
+    const modalHora = document.getElementById("modal-hora");
+    if (modalHora) {
+      modalHora.textContent = new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit" });
+    }
   }
-  tick();
-  setInterval(tick, 1000);
+  tick(); setInterval(tick, 1000);
 }
 
 // ══════════════════════════════════════════════════════════════
-// CATÁLOGOS (con caché local para offline)
+// CATÁLOGOS
 // ══════════════════════════════════════════════════════════════
 async function cargarCatalogos() {
+  document.getElementById("card-aviso-catalogo").style.display = "none";
   try {
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
     const [resEmp, resEdi] = await Promise.all([
-      fetch(API_URL + "?accion=empleados"),
-      fetch(API_URL + "?accion=edificios")
+      fetch(API_URL + "?accion=empleados", { signal: ctrl.signal }),
+      fetch(API_URL + "?accion=edificios",  { signal: ctrl.signal })
     ]);
-    if (!resEmp.ok || !resEdi.ok) throw new Error("Error de red");
-    empleados = await resEmp.json();
-    edificios = await resEdi.json();
+    clearTimeout(timer);
+    if (!resEmp.ok || !resEdi.ok) throw new Error("HTTP " + resEmp.status);
+    const empData = await resEmp.json();
+    const ediData = await resEdi.json();
+    if (!Array.isArray(empData) || !Array.isArray(ediData)) throw new Error("Formato inesperado");
+    empleados = empData;
+    edificios = ediData;
     localStorage.setItem("cache_empleados", JSON.stringify(empleados));
     localStorage.setItem("cache_edificios",  JSON.stringify(edificios));
+    setEstado("Catálogos cargados. Selecciona tu nombre para comenzar.", "");
+    return;
   } catch(e) {
-    const cE = localStorage.getItem("cache_empleados");
-    const cD = localStorage.getItem("cache_edificios");
-    if (cE) empleados = JSON.parse(cE);
-    if (cD) edificios = JSON.parse(cD);
-    if (!empleados.length) setEstado("Sin conexión y sin datos en caché. Conéctate e intenta de nuevo.", "error");
+    console.warn("Servidor no disponible:", e.message);
+  }
+
+  // Fallback a caché
+  const cE = localStorage.getItem("cache_empleados");
+  const cD = localStorage.getItem("cache_edificios");
+  if (cE) empleados = JSON.parse(cE);
+  if (cD) edificios = JSON.parse(cD);
+
+  if (empleados.length && edificios.length) {
+    setEstado("⚠ Usando datos en caché. Los catálogos pueden no estar al día.", "aviso");
+  } else {
+    document.getElementById("card-aviso-catalogo").style.display = "block";
+    setEstado("Sin conexión al servidor y sin datos en caché.", "error");
   }
 }
 
+async function reintentarCatalogos() {
+  setEstado("Reintentando conexión...", "cargando");
+  await cargarCatalogos();
+  if (empleados.length) renderDropdown(empleados);
+}
+
 // ══════════════════════════════════════════════════════════════
-// PARÁMETRO NFC (?edificio=ED01 en la URL)
+// PARÁMETRO NFC (?edificio=ED01)
 // ══════════════════════════════════════════════════════════════
 function leerParametrosURL() {
   const params = new URLSearchParams(window.location.search);
   const idEd   = params.get("edificio");
   if (!idEd) return;
-  // Se ejecuta después de que el GPS confirme — solo preselecciona visualmente
-  // La validación real la hace el servidor por GPS
   const ed = edificios.find(e => e.id === idEd);
   if (ed) {
     document.getElementById("edificio-nombre").textContent = ed.nombre + " (vía NFC)";
@@ -485,7 +573,7 @@ function leerParametrosURL() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// DROPDOWN CON BÚSQUEDA
+// DROPDOWN
 // ══════════════════════════════════════════════════════════════
 function configurarDropdown() {
   const input = document.getElementById("busqueda");
@@ -499,11 +587,11 @@ function configurarDropdown() {
 function renderDropdown(lista) {
   const dd = document.getElementById("dropdown");
   if (!lista.length) {
-    dd.innerHTML = '<div class="dropdown-empty">Sin resultados</div>';
+    dd.innerHTML = '<div class="dropdown-empty">Sin resultados — intenta otro término</div>';
     return;
   }
-  dd.innerHTML = lista.map(e =>
-    `<div class="dropdown-item" data-id="${e.id}" data-nombre="${e.nombre}"
+  dd.innerHTML = lista.slice(0, 80).map(e =>
+    `<div class="dropdown-item"
           onclick="seleccionarEmpleado('${e.id}','${encodeURIComponent(e.nombre)}')">
        <div>${e.nombre}</div>
        <div class="emp-id">${e.id}</div>
@@ -520,21 +608,19 @@ function filtrarEmpleados() {
   abrirDropdown();
 }
 
-function abrirDropdown() { document.getElementById("dropdown").classList.add("open"); }
+function abrirDropdown()  { document.getElementById("dropdown").classList.add("open"); }
 function cerrarDropdown() { document.getElementById("dropdown").classList.remove("open"); }
 
 function seleccionarEmpleado(id, nombreEncoded) {
   const nombre = decodeURIComponent(nombreEncoded);
   empleadoSeleccionado = { id, nombre };
   document.getElementById("id_empleado").value = id;
-
-  // Ocultar buscador, mostrar confirmación
   document.getElementById("search-wrapper").style.display = "none";
   document.getElementById("empleado-confirmado").classList.add("visible");
   document.getElementById("emp-nombre-display").textContent = nombre;
   document.getElementById("emp-id-display").textContent     = id;
   cerrarDropdown();
-  verificarListo();
+  actualizarChecklist();
 }
 
 function resetEmpleado() {
@@ -543,7 +629,7 @@ function resetEmpleado() {
   document.getElementById("busqueda").value    = "";
   document.getElementById("search-wrapper").style.display = "";
   document.getElementById("empleado-confirmado").classList.remove("visible");
-  verificarListo();
+  actualizarChecklist();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -554,32 +640,28 @@ function seleccionarTurno(turno) {
   document.getElementById("turno_seleccionado").value = turno;
   document.getElementById("btn-mat").classList.toggle("selected", turno === "Matutino");
   document.getElementById("btn-ves").classList.toggle("selected", turno === "Vespertino");
-
-  // Mostrar horas de referencia en los botones de evento
   const t = TURNOS_UX[turno];
-  document.getElementById("hint-entrada").textContent = "Hora: " + t.entrada;
+  document.getElementById("hint-entrada").textContent = "Hora límite: " + t.entrada;
   document.getElementById("hint-salida").textContent  = "Hora: " + t.salida;
-
-  verificarListo();
+  actualizarChecklist();
 }
 
 // ══════════════════════════════════════════════════════════════
-// GPS Y GEOFENCE (watchPosition — actualización continua)
+// GPS
 // ══════════════════════════════════════════════════════════════
 function iniciarGPS() {
   if (!navigator.geolocation) {
     setEdificio("fuera", "GPS no disponible", "Este dispositivo no soporta geolocalización.");
-    return;
+    actualizarChecklist(); return;
   }
   navigator.geolocation.watchPosition(
     pos => procesarGPS(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
     err => {
-      const msgs = {
-        1: "Permiso de ubicación denegado. Ve a ajustes del navegador y permite el acceso.",
-        2: "No se pudo obtener la ubicación. Sal a un área con mejor señal.",
-        3: "Tiempo de espera agotado. Reintentando..."
-      };
-      setEdificio("fuera", "Error de GPS", msgs[err.code] || "Error desconocido de GPS.");
+      const msgs = { 1:"Permiso denegado. Ve a ajustes y permite la ubicación.",
+                     2:"No se pudo obtener ubicación. Sal a exteriores.",
+                     3:"Tiempo agotado. Reintentando..." };
+      setEdificio("fuera", "Error de GPS", msgs[err.code] || "Error de GPS.");
+      edificioDetectado = null; actualizarChecklist();
     },
     { enableHighAccuracy: true, maximumAge: 20000, timeout: 15000 }
   );
@@ -587,14 +669,11 @@ function iniciarGPS() {
 
 function procesarGPS(lat, lon, precision) {
   gpsActual = { lat, lon, precision };
-  const precTexto = "±" + Math.round(precision) + "m";
-  document.getElementById("gps-precision").textContent = precTexto;
+  document.getElementById("gps-precision").textContent = "±" + Math.round(precision) + "m";
 
   if (precision > 150) {
-    setEdificio("cargando", "Señal GPS débil (" + precTexto + ")", "Sal a exteriores para mejorar la precisión.");
-    edificioDetectado = null;
-    verificarListo();
-    return;
+    setEdificio("cargando", "Señal GPS débil (±" + Math.round(precision) + "m)", "Sal a exteriores para mejorar la señal.");
+    edificioDetectado = null; actualizarChecklist(); return;
   }
 
   let masCercano = null, distMin = Infinity;
@@ -603,7 +682,7 @@ function procesarGPS(lat, lon, precision) {
     if (d < distMin) { distMin = d; masCercano = ed; }
   });
 
-  const radio = masCercano ? (masCercano.radio || 100) : 100;
+  const radio = (masCercano && masCercano.radio) ? masCercano.radio : 100;
 
   if (masCercano && distMin <= radio) {
     edificioDetectado = masCercano;
@@ -613,24 +692,23 @@ function procesarGPS(lat, lon, precision) {
     edificioDetectado = null;
     document.getElementById("id_edificio").value = "";
     const sub = masCercano
-      ? "Más cercano: " + masCercano.nombre + " (" + Math.round(distMin) + "m — fuera de rango)"
+      ? "Más cercano: " + masCercano.nombre + " (" + Math.round(distMin) + "m, fuera de rango)"
       : "No hay edificios registrados cerca.";
     setEdificio("fuera", "Fuera de área", sub);
   }
-  verificarListo();
+  actualizarChecklist();
 }
 
 function setEdificio(estado, nombre, sub) {
-  const badge = document.getElementById("edificio-badge");
-  badge.className = "edificio-badge " + estado;
+  document.getElementById("edificio-badge").className = "edificio-badge " + estado;
   document.getElementById("edificio-nombre").textContent = nombre;
   document.getElementById("edificio-sub").textContent    = sub || "";
 }
 
 function haversine(lat1, lon1, lat2, lon2) {
   const R  = 6371000;
-  const p1 = lat1 * Math.PI / 180, p2 = lat2 * Math.PI / 180;
-  const dp = (lat2 - lat1) * Math.PI / 180, dl = (lon2 - lon1) * Math.PI / 180;
+  const p1 = lat1*Math.PI/180, p2 = lat2*Math.PI/180;
+  const dp = (lat2-lat1)*Math.PI/180, dl = (lon2-lon1)*Math.PI/180;
   const a  = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
@@ -649,74 +727,125 @@ async function iniciarCamara() {
     video.addEventListener("loadedmetadata", () => {
       document.getElementById("camara-overlay").classList.add("oculto");
       camaraLista = true;
-      verificarListo();
+      actualizarChecklist();
     });
   } catch(e) {
     document.getElementById("camara-overlay").textContent =
       "Sin acceso a la cámara. Permite el permiso en tu navegador y recarga la página.";
     camaraLista = false;
+    actualizarChecklist();
   }
 }
 
 function capturarSelfie() {
-  const video  = document.getElementById("video");
+  const video = document.getElementById("video");
   const canvas = document.createElement("canvas");
-  canvas.width  = 320;
-  canvas.height = 240;
+  canvas.width = 320; canvas.height = 240;
   const ctx = canvas.getContext("2d");
-  ctx.translate(320, 0);
-  ctx.scale(-1, 1); // espejo para que la selfie salga correcta
+  ctx.translate(320, 0); ctx.scale(-1, 1);
   ctx.drawImage(video, 0, 0, 320, 240);
-  return canvas.toDataURL("image/jpeg", 0.55); // ~35–55 KB
+  return canvas.toDataURL("image/jpeg", 0.55);
 }
 
 // ══════════════════════════════════════════════════════════════
-// HABILITAR BOTONES
+// CHECKLIST
 // ══════════════════════════════════════════════════════════════
-function verificarListo() {
-  const listo = empleadoSeleccionado && turnoSeleccionado && edificioDetectado && camaraLista;
+function actualizarChecklist() {
+  const estados = {
+    "chk-empleado": !!empleadoSeleccionado,
+    "chk-turno":    !!turnoSeleccionado,
+    "chk-gps":      !!edificioDetectado,
+    "chk-camara":   camaraLista
+  };
+  Object.entries(estados).forEach(([id, ok]) => {
+    document.getElementById(id).classList.toggle("ok", ok);
+  });
+  const listo = Object.values(estados).every(Boolean);
   ["btn-entrada","btn-ini-com","btn-fin-com","btn-salida"].forEach(id => {
     document.getElementById(id).disabled = !listo;
   });
-  if (listo && document.getElementById("estado").className === "") {
-    setEstado("Todo listo — selecciona el tipo de registro.", "");
+  if (!listo) {
+    const faltantes = [];
+    if (!empleadoSeleccionado) faltantes.push("selecciona tu nombre");
+    if (!turnoSeleccionado)    faltantes.push("elige el turno");
+    if (!edificioDetectado)    faltantes.push("acércate al edificio");
+    if (!camaraLista)          faltantes.push("permite la cámara");
+    setEstado("Falta: " + faltantes.join(" · "), "");
+  } else {
+    setEstado("Todo listo — toca el evento que quieres registrar.", "ok");
   }
 }
 
 // ══════════════════════════════════════════════════════════════
-// REGISTRO
+// MODAL DE CONFIRMACIÓN
 // ══════════════════════════════════════════════════════════════
-async function registrar(evento) {
+function pedirConfirmacion(evento) {
   if (enviando) return;
+  eventoEnEspera = evento;
 
-  // Validación final en cliente (el servidor también valida)
-  if (!empleadoSeleccionado) { setEstado("Selecciona tu nombre primero.", "error"); return; }
-  if (!turnoSeleccionado)    { setEstado("Selecciona el turno de este registro.", "error"); return; }
-  if (!edificioDetectado)    { setEstado("No estás dentro del área de trabajo.", "error"); return; }
-  if (!camaraLista)          { setEstado("La cámara no está lista.", "error"); return; }
+  const cfg = EVENTOS_CONFIG[evento];
+
+  // Rellenar el modal
+  const badge = document.getElementById("modal-evento-badge");
+  badge.className = "modal-evento-badge " + cfg.clase;
+  document.getElementById("modal-evento-icono").textContent = cfg.icono;
+  document.getElementById("modal-evento-texto").textContent = cfg.etiqueta;
+
+  document.getElementById("modal-empleado").textContent =
+    empleadoSeleccionado.nombre + " (" + empleadoSeleccionado.id + ")";
+  document.getElementById("modal-turno").textContent    = turnoSeleccionado;
+  document.getElementById("modal-edificio").textContent = edificioDetectado.nombre;
+  document.getElementById("modal-hora").textContent     =
+    new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit" });
+
+  // Botón confirmar con color del evento
+  const btnConf = document.getElementById("btn-modal-confirmar");
+  btnConf.className = "btn-modal-confirmar " + cfg.clase;
+  btnConf.textContent = "Confirmar " + cfg.etiqueta;
+  btnConf.disabled = false;
+
+  // Mostrar modal
+  document.getElementById("modal-backdrop").classList.add("visible");
+}
+
+function cerrarModal() {
+  document.getElementById("modal-backdrop").classList.remove("visible");
+  eventoEnEspera = null;
+}
+
+function cerrarModalSiFondo(event) {
+  // Solo cierra si el clic fue en el fondo oscuro, no dentro del modal
+  if (event.target === document.getElementById("modal-backdrop")) {
+    cerrarModal();
+  }
+}
+
+async function confirmarRegistro() {
+  if (!eventoEnEspera || enviando) return;
+
+  const evento = eventoEnEspera;
+  cerrarModal();
 
   enviando = true;
   setEstado("Capturando selfie y enviando registro...", "cargando");
   deshabilitarBotones(true);
-
-  const selfie = capturarSelfie();
 
   const payload = {
     id_empleado: empleadoSeleccionado.id,
     nombre:      empleadoSeleccionado.nombre,
     turno:       turnoSeleccionado,
     evento:      evento,
-    latitud:     gpsActual ? gpsActual.lat : null,
-    longitud:    gpsActual ? gpsActual.lon : null,
+    latitud:     gpsActual ? gpsActual.lat  : null,
+    longitud:    gpsActual ? gpsActual.lon  : null,
     precision:   gpsActual ? gpsActual.precision : null,
-    selfie:      selfie
+    selfie:      capturarSelfie()
   };
 
   if (navigator.onLine) {
     await enviarRegistro(payload);
   } else {
     guardarEnCola(payload);
-    setEstado("Sin conexión. El registro se guardó localmente y se enviará cuando recuperes señal.", "error");
+    setEstado("Sin conexión. Registro guardado — se enviará al recuperar señal.", "aviso");
   }
 
   enviando = false;
@@ -726,9 +855,9 @@ async function registrar(evento) {
 async function enviarRegistro(payload) {
   try {
     const res  = await fetch(API_URL, {
-      method:  "POST",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload)
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (data.status === "OK") {
@@ -738,13 +867,13 @@ async function enviarRegistro(payload) {
     }
   } catch(e) {
     guardarEnCola(payload);
-    setEstado("Error de red. Registro guardado para reintento automático.", "error");
+    setEstado("Error de red. Registro guardado para reintento automático.", "aviso");
   }
 }
 
-function deshabilitarBotones(deshabilitar) {
+function deshabilitarBotones(off) {
   ["btn-entrada","btn-ini-com","btn-fin-com","btn-salida"].forEach(id => {
-    document.getElementById(id).disabled = deshabilitar;
+    document.getElementById(id).disabled = off;
   });
 }
 
@@ -764,21 +893,15 @@ async function procesarCola() {
   for (const item of cola) {
     try {
       const res  = await fetch(API_URL, {
-        method:  "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(item.payload)
+        body: JSON.stringify(item.payload)
       });
       const data = await res.json();
       if (data.status !== "OK") pendientes.push(item);
-    } catch(e) {
-      pendientes.push(item);
-    }
+    } catch(e) { pendientes.push(item); }
   }
   localStorage.setItem("cola_offline", JSON.stringify(pendientes));
-  const enviados = cola.length - pendientes.length;
-  if (enviados > 0) {
-    console.log("Cola offline: " + enviados + " registro(s) enviado(s).");
-  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -787,7 +910,7 @@ async function procesarCola() {
 function escucharConectividad() {
   const bar = document.getElementById("offline-bar");
   window.addEventListener("online",  () => { bar.classList.remove("visible"); procesarCola(); });
-  window.addEventListener("offline", () =>   bar.classList.add("visible"));
+  window.addEventListener("offline", () => bar.classList.add("visible"));
   if (!navigator.onLine) bar.classList.add("visible");
 }
 
@@ -800,9 +923,6 @@ function registrarServiceWorker() {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════════════════════════
 function setEstado(msg, tipo) {
   const el = document.getElementById("estado");
   el.textContent = msg;
