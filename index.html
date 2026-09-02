@@ -83,8 +83,8 @@
       border: 1px solid #1e3a1e; border-radius: 10px; margin-top: 10px;
     }
     .empleado-confirmado.visible { display: flex; }
-    .emp-nombre    { font-size: 15px; font-weight: 500; color: #e8e8f0; }
-    .emp-id-small  { font-size: 11px; color: #4b5563; }
+    .emp-nombre   { font-size: 15px; font-weight: 500; color: #e8e8f0; }
+    .emp-id-small { font-size: 11px; color: #4b5563; }
     .check-emp {
       width: 20px; height: 20px; background: #166534; border-radius: 50%;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
@@ -214,7 +214,7 @@
     ══════════════════════════════════════════════ */
     .modal-backdrop {
       position: fixed; inset: 0;
-      background: rgba(5, 5, 15, 0.85);
+      background: rgba(5,5,15,0.85);
       backdrop-filter: blur(4px);
       z-index: 500;
       display: flex; align-items: flex-end; justify-content: center;
@@ -222,51 +222,41 @@
       opacity: 0; pointer-events: none;
       transition: opacity 0.2s;
     }
-    .modal-backdrop.visible {
-      opacity: 1; pointer-events: all;
-    }
+    .modal-backdrop.visible { opacity: 1; pointer-events: all; }
     .modal {
       background: #1e1e38; border: 1px solid #2d2d50;
       border-radius: 20px; padding: 24px;
       width: 100%; max-width: 400px;
       transform: translateY(30px);
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .modal-backdrop.visible .modal {
-      transform: translateY(0);
-    }
+    .modal-backdrop.visible .modal { transform: translateY(0); }
 
     .modal-titulo {
       font-size: 11px; letter-spacing: 1.8px; color: #4b5563;
       text-transform: uppercase; margin-bottom: 16px;
     }
-
-    /* Badge del evento seleccionado */
     .modal-evento-badge {
       display: flex; align-items: center; justify-content: center;
       padding: 18px; border-radius: 14px; margin-bottom: 16px;
-      font-size: 20px; font-weight: 700; letter-spacing: 0.3px;
-      gap: 10px;
+      font-size: 20px; font-weight: 700; gap: 10px;
     }
-    .modal-evento-badge.entrada  { background: #052e16; color: #22c55e; border: 1.5px solid #166534; }
-    .modal-evento-badge.ini-com  { background: #1c0a00; color: #f59e0b; border: 1.5px solid #92400e; }
-    .modal-evento-badge.fin-com  { background: #0c1a2e; color: #3b82f6; border: 1.5px solid #1d4ed8; }
-    .modal-evento-badge.salida   { background: #1c0505; color: #ef4444; border: 1.5px solid #991b1b; }
+    .modal-evento-badge.entrada { background:#052e16; color:#22c55e; border:1.5px solid #166534; }
+    .modal-evento-badge.ini-com { background:#1c0a00; color:#f59e0b; border:1.5px solid #92400e; }
+    .modal-evento-badge.fin-com { background:#0c1a2e; color:#3b82f6; border:1.5px solid #1d4ed8; }
+    .modal-evento-badge.salida  { background:#1c0505; color:#ef4444; border:1.5px solid #991b1b; }
 
-    /* Resumen del registro */
     .modal-resumen {
       background: #0f0f1a; border: 1px solid #252540;
       border-radius: 12px; padding: 14px 16px;
       margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px;
     }
     .resumen-fila {
-      display: flex; justify-content: space-between; align-items: baseline;
-      font-size: 13px;
+      display: flex; justify-content: space-between; align-items: baseline; font-size: 13px;
     }
     .resumen-label { color: #4b5563; font-size: 11px; }
     .resumen-valor { color: #e8e8f0; font-weight: 500; text-align: right; max-width: 220px; }
 
-    /* Botones del modal */
     .modal-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btn-modal-cancelar {
       padding: 15px; border: 1.5px solid #252540; border-radius: 12px;
@@ -280,11 +270,11 @@
       transition: opacity 0.15s, transform 0.1s;
     }
     .btn-modal-confirmar:active { transform: scale(0.97); }
-    .btn-modal-confirmar.entrada { background: #22c55e; color: #052e16; }
-    .btn-modal-confirmar.ini-com { background: #f59e0b; color: #1c0a00; }
-    .btn-modal-confirmar.fin-com { background: #3b82f6; color: #e0f0ff; }
-    .btn-modal-confirmar.salida  { background: #ef4444; color: #fff0f0; }
     .btn-modal-confirmar:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-modal-confirmar.entrada { background:#22c55e; color:#052e16; }
+    .btn-modal-confirmar.ini-com { background:#f59e0b; color:#1c0a00; }
+    .btn-modal-confirmar.fin-com { background:#3b82f6; color:#e0f0ff; }
+    .btn-modal-confirmar.salida  { background:#ef4444; color:#fff0f0; }
 
     .modal-advertencia {
       font-size: 11px; color: #4b5563; text-align: center;
@@ -305,7 +295,7 @@
 <div class="card" id="card-aviso-catalogo">
   <div class="catalogo-aviso">
     ⚠ No se pudo conectar al servidor para cargar los catálogos.<br><br>
-    Verifica que la URL de Apps Script esté correctamente configurada en el código
+    Verifica que la URL de Apps Script esté correctamente configurada
     y que el deployment esté publicado como <strong>"Cualquiera tiene acceso"</strong>.
     <br>
     <button class="btn-reintentar" onclick="reintentarCatalogos()">↺ Reintentar conexión</button>
@@ -400,20 +390,14 @@
   </p>
 </div>
 
-<!-- ══════════════════════════════════════════════
-     MODAL DE CONFIRMACIÓN
-══════════════════════════════════════════════ -->
+<!-- ══ MODAL DE CONFIRMACIÓN ══ -->
 <div class="modal-backdrop" id="modal-backdrop" onclick="cerrarModalSiFondo(event)">
   <div class="modal">
     <p class="modal-titulo">Confirma tu registro</p>
-
-    <!-- Badge del evento -->
     <div class="modal-evento-badge" id="modal-evento-badge">
       <span id="modal-evento-icono"></span>
       <span id="modal-evento-texto"></span>
     </div>
-
-    <!-- Resumen -->
     <div class="modal-resumen">
       <div class="resumen-fila">
         <span class="resumen-label">Empleado</span>
@@ -432,17 +416,10 @@
         <span class="resumen-valor" id="modal-hora"></span>
       </div>
     </div>
-
-    <!-- Botones -->
     <div class="modal-botones">
-      <button class="btn-modal-cancelar" id="btn-modal-cancelar" onclick="cerrarModal()">
-        Cancelar
-      </button>
-      <button class="btn-modal-confirmar" id="btn-modal-confirmar" onclick="confirmarRegistro()">
-        Confirmar
-      </button>
+      <button class="btn-modal-cancelar" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-modal-confirmar" id="btn-modal-confirmar" onclick="confirmarRegistro()">Confirmar</button>
     </div>
-
     <p class="modal-advertencia">
       El registro usa la hora del servidor y no puede modificarse una vez enviado.
     </p>
@@ -456,7 +433,7 @@
 <script>
 // ══════════════════════════════════════════════════════════════
 // ⚠ ÚNICA LÍNEA QUE DEBES EDITAR:
-const API_URL = "https://script.google.com/macros/s/AKfycbz5T06Jz794u-xXpeRKNtC-Qqw0bHCSvxP2hcMjAvrUXUL_Ne8gy39yQ3vnz4FwEEzP8A/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwOuQEMMJE516Lt_nDVxi8dwfzZXUstButwmCC288fB4XECxSCYcxniJHOuFTAOr0hQ_g/exec";
 // ══════════════════════════════════════════════════════════════
 
 const TURNOS_UX = {
@@ -479,7 +456,7 @@ let edificioDetectado    = null;
 let gpsActual            = null;
 let camaraLista          = false;
 let enviando             = false;
-let eventoEnEspera       = null; // el evento que el empleado tocó, esperando confirmación
+let eventoEnEspera       = null;
 
 // ══════════════════════════════════════════════════════════════
 // INIT
@@ -500,19 +477,16 @@ async function inicializar() {
 // ══════════════════════════════════════════════════════════════
 function iniciarReloj() {
   function tick() {
-    document.getElementById("reloj").textContent =
-      new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
-    // Actualiza la hora en el modal si está abierto
-    const modalHora = document.getElementById("modal-hora");
-    if (modalHora) {
-      modalHora.textContent = new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit" });
-    }
+    const hora = new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+    document.getElementById("reloj").textContent = hora;
+    const mh = document.getElementById("modal-hora");
+    if (mh) mh.textContent = new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit" });
   }
   tick(); setInterval(tick, 1000);
 }
 
 // ══════════════════════════════════════════════════════════════
-// CATÁLOGOS
+// CATÁLOGOS — con caché local para uso offline
 // ══════════════════════════════════════════════════════════════
 async function cargarCatalogos() {
   document.getElementById("card-aviso-catalogo").style.display = "none";
@@ -537,13 +511,11 @@ async function cargarCatalogos() {
   } catch(e) {
     console.warn("Servidor no disponible:", e.message);
   }
-
-  // Fallback a caché
+  // Fallback a caché local
   const cE = localStorage.getItem("cache_empleados");
   const cD = localStorage.getItem("cache_edificios");
   if (cE) empleados = JSON.parse(cE);
   if (cD) edificios = JSON.parse(cD);
-
   if (empleados.length && edificios.length) {
     setEstado("⚠ Usando datos en caché. Los catálogos pueden no estar al día.", "aviso");
   } else {
@@ -559,7 +531,7 @@ async function reintentarCatalogos() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// PARÁMETRO NFC (?edificio=ED01)
+// PARÁMETRO NFC (?edificio=ED01 en la URL)
 // ══════════════════════════════════════════════════════════════
 function leerParametrosURL() {
   const params = new URLSearchParams(window.location.search);
@@ -573,7 +545,7 @@ function leerParametrosURL() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// DROPDOWN
+// DROPDOWN CON BÚSQUEDA
 // ══════════════════════════════════════════════════════════════
 function configurarDropdown() {
   const input = document.getElementById("busqueda");
@@ -641,13 +613,13 @@ function seleccionarTurno(turno) {
   document.getElementById("btn-mat").classList.toggle("selected", turno === "Matutino");
   document.getElementById("btn-ves").classList.toggle("selected", turno === "Vespertino");
   const t = TURNOS_UX[turno];
-  document.getElementById("hint-entrada").textContent = "Hora límite: " + t.entrada;
-  document.getElementById("hint-salida").textContent  = "Hora: " + t.salida;
+  document.getElementById("hint-entrada").textContent = "Límite: " + t.entrada;
+  document.getElementById("hint-salida").textContent  = "Hora: "   + t.salida;
   actualizarChecklist();
 }
 
 // ══════════════════════════════════════════════════════════════
-// GPS
+// GPS Y GEOFENCE
 // ══════════════════════════════════════════════════════════════
 function iniciarGPS() {
   if (!navigator.geolocation) {
@@ -657,9 +629,11 @@ function iniciarGPS() {
   navigator.geolocation.watchPosition(
     pos => procesarGPS(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
     err => {
-      const msgs = { 1:"Permiso denegado. Ve a ajustes y permite la ubicación.",
-                     2:"No se pudo obtener ubicación. Sal a exteriores.",
-                     3:"Tiempo agotado. Reintentando..." };
+      const msgs = {
+        1: "Permiso denegado. Ve a ajustes y permite la ubicación.",
+        2: "No se pudo obtener ubicación. Sal a exteriores.",
+        3: "Tiempo agotado. Reintentando..."
+      };
       setEdificio("fuera", "Error de GPS", msgs[err.code] || "Error de GPS.");
       edificioDetectado = null; actualizarChecklist();
     },
@@ -737,18 +711,8 @@ async function iniciarCamara() {
   }
 }
 
-function capturarSelfie() {
-  const video = document.getElementById("video");
-  const canvas = document.createElement("canvas");
-  canvas.width = 320; canvas.height = 240;
-  const ctx = canvas.getContext("2d");
-  ctx.translate(320, 0); ctx.scale(-1, 1);
-  ctx.drawImage(video, 0, 0, 320, 240);
-  return canvas.toDataURL("image/jpeg", 0.55);
-}
-
 // ══════════════════════════════════════════════════════════════
-// CHECKLIST
+// CHECKLIST Y HABILITACIÓN DE BOTONES
 // ══════════════════════════════════════════════════════════════
 function actualizarChecklist() {
   const estados = {
@@ -782,15 +746,12 @@ function actualizarChecklist() {
 function pedirConfirmacion(evento) {
   if (enviando) return;
   eventoEnEspera = evento;
-
   const cfg = EVENTOS_CONFIG[evento];
 
-  // Rellenar el modal
   const badge = document.getElementById("modal-evento-badge");
   badge.className = "modal-evento-badge " + cfg.clase;
   document.getElementById("modal-evento-icono").textContent = cfg.icono;
   document.getElementById("modal-evento-texto").textContent = cfg.etiqueta;
-
   document.getElementById("modal-empleado").textContent =
     empleadoSeleccionado.nombre + " (" + empleadoSeleccionado.id + ")";
   document.getElementById("modal-turno").textContent    = turnoSeleccionado;
@@ -798,13 +759,11 @@ function pedirConfirmacion(evento) {
   document.getElementById("modal-hora").textContent     =
     new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit" });
 
-  // Botón confirmar con color del evento
   const btnConf = document.getElementById("btn-modal-confirmar");
-  btnConf.className = "btn-modal-confirmar " + cfg.clase;
+  btnConf.className   = "btn-modal-confirmar " + cfg.clase;
   btnConf.textContent = "Confirmar " + cfg.etiqueta;
-  btnConf.disabled = false;
+  btnConf.disabled    = false;
 
-  // Mostrar modal
   document.getElementById("modal-backdrop").classList.add("visible");
 }
 
@@ -814,20 +773,16 @@ function cerrarModal() {
 }
 
 function cerrarModalSiFondo(event) {
-  // Solo cierra si el clic fue en el fondo oscuro, no dentro del modal
-  if (event.target === document.getElementById("modal-backdrop")) {
-    cerrarModal();
-  }
+  if (event.target === document.getElementById("modal-backdrop")) cerrarModal();
 }
 
 async function confirmarRegistro() {
   if (!eventoEnEspera || enviando) return;
-
   const evento = eventoEnEspera;
   cerrarModal();
 
   enviando = true;
-  setEstado("Capturando selfie y enviando registro...", "cargando");
+  setEstado("Enviando registro...", "cargando");
   deshabilitarBotones(true);
 
   const payload = {
@@ -835,10 +790,9 @@ async function confirmarRegistro() {
     nombre:      empleadoSeleccionado.nombre,
     turno:       turnoSeleccionado,
     evento:      evento,
-    latitud:     gpsActual ? gpsActual.lat  : null,
-    longitud:    gpsActual ? gpsActual.lon  : null,
-    precision:   gpsActual ? gpsActual.precision : null,
-    selfie:      capturarSelfie()
+    latitud:     gpsActual ? gpsActual.lat       : null,
+    longitud:    gpsActual ? gpsActual.lon       : null,
+    precision:   gpsActual ? gpsActual.precision : null
   };
 
   if (navigator.onLine) {
@@ -852,14 +806,25 @@ async function confirmarRegistro() {
   deshabilitarBotones(false);
 }
 
+// ══════════════════════════════════════════════════════════════
+// ENVÍO VÍA GET (evita problemas de CORS con Apps Script)
+// ══════════════════════════════════════════════════════════════
 async function enviarRegistro(payload) {
   try {
-    const res  = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    const params = new URLSearchParams({
+      accion:      "registro",
+      id_empleado: payload.id_empleado,
+      nombre:      payload.nombre,
+      turno:       payload.turno,
+      evento:      payload.evento,
+      latitud:     payload.latitud   !== null ? payload.latitud   : "",
+      longitud:    payload.longitud  !== null ? payload.longitud  : "",
+      precision:   payload.precision !== null ? payload.precision : ""
     });
+
+    const res  = await fetch(API_URL + "?" + params.toString());
     const data = await res.json();
+
     if (data.status === "OK") {
       setEstado("✓ " + data.mensaje, "ok");
     } else {
@@ -871,14 +836,8 @@ async function enviarRegistro(payload) {
   }
 }
 
-function deshabilitarBotones(off) {
-  ["btn-entrada","btn-ini-com","btn-fin-com","btn-salida"].forEach(id => {
-    document.getElementById(id).disabled = off;
-  });
-}
-
 // ══════════════════════════════════════════════════════════════
-// COLA OFFLINE
+// COLA OFFLINE — guarda en localStorage y reintenta al reconectar
 // ══════════════════════════════════════════════════════════════
 function guardarEnCola(payload) {
   const cola = JSON.parse(localStorage.getItem("cola_offline") || "[]");
@@ -892,14 +851,22 @@ async function procesarCola() {
   const pendientes = [];
   for (const item of cola) {
     try {
-      const res  = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(item.payload)
+      const params = new URLSearchParams({
+        accion:      "registro",
+        id_empleado: item.payload.id_empleado,
+        nombre:      item.payload.nombre,
+        turno:       item.payload.turno,
+        evento:      item.payload.evento,
+        latitud:     item.payload.latitud   !== null ? item.payload.latitud   : "",
+        longitud:    item.payload.longitud  !== null ? item.payload.longitud  : "",
+        precision:   item.payload.precision !== null ? item.payload.precision : ""
       });
+      const res  = await fetch(API_URL + "?" + params.toString());
       const data = await res.json();
       if (data.status !== "OK") pendientes.push(item);
-    } catch(e) { pendientes.push(item); }
+    } catch(e) {
+      pendientes.push(item);
+    }
   }
   localStorage.setItem("cola_offline", JSON.stringify(pendientes));
 }
@@ -921,6 +888,12 @@ function registrarServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(e => console.warn("SW:", e));
   }
+}
+
+function deshabilitarBotones(off) {
+  ["btn-entrada","btn-ini-com","btn-fin-com","btn-salida"].forEach(id => {
+    document.getElementById(id).disabled = off;
+  });
 }
 
 function setEstado(msg, tipo) {
