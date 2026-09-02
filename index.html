@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f0f1a">
+  <title>Registro de Asistencia</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f1a;
+      color: #e8e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px 40px;
+    }
+
+    .app-header {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .app-logo { font-size: 11px; letter-spacing: 2px; color: #4b5563; text-transform: uppercase; }
+    .app-time { font-size: 13px; color: #6b7280; font-variant-numeric: tabular-nums; }
+
+    .card {
+      background: #16162a;
+      border: 1px solid #252540;
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 12px;
+    }
+    .card-label {
+      font-size: 10px;
+      letter-spacing: 1.8px;
+      color: #4b5563;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* ── Selector de empleado ── */
+    .search-wrapper { position: relative; }
+    .search-input {
+      width: 100%;
+      padding: 13px 16px;
+      background: #0f0f1a;
+      border: 1px solid #252540;
+      border-radius: 10px;
+      color: #e8e8f0;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .search-input:focus { border-color: #6366f1; }
+    .search-input::placeholder { color: #374151; }
+
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: #1e1e38;
+      border: 1px solid #252540;
+      border-radius: 10px;
+      max-height: 210px;
+      overflow-y: auto;
+      z-index: 200;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .dropdown.open { display: block; }
+    .dropdown-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 1px solid #1a1a30;
+      transition: background 0.12s;
+      line-height: 1.4;
+    }
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background: #252545; }
+    .dropdown-item .emp-id { font-size: 11px; color: #4b5563; margin-top: 2px; }
+    .dropdown-empty { padding: 16px; text-align: center; color: #4b5563; font-size: 13px; }
+
+    .empleado-confirmado {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #0f0f1a;
+      border: 1px solid #1e3a1e;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    .empleado-confirmado.visible { display: flex; }
+    .empleado-confirmado .emp-nombre { font-size: 15px; font-weight: 500; color: #e8e8f0; }
+    .empleado-confirmado .emp-id-small { font-size: 11px; color: #4b5563; }
+    .check-emp { width: 20px; height: 20px; background: #166534; border-radius: 50%;
+                 display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .check-emp svg { width: 11px; height: 11px; }
+    .btn-cambiar {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: #6b7280;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .btn-cambiar:hover { background: #252540; color: #e8e8f0; }
+
+    /* ── Selector de turno ── */
+    .turno-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-turno {
+      padding: 14px 10px;
+      background: #0f0f1a;
+      border: 1.5px solid #252540;
+      border-radius: 10px;
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .btn-turno .turno-horas { font-size: 11px; color: #374151; margin-top: 3px; }
+    .btn-turno.selected {
+      background: #1e1e40;
+      border-color: #6366f1;
+      color: #a5b4fc;
+    }
+    .btn-turno.selected .turno-horas { color: #6366f1; }
+
+    /* ── Edificio detectado ── */
+    .edificio-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      background: #0f0f1a;
+      border: 1px solid #252540;
+      border-radius: 10px;
+      font-size: 14px;
+      min-height: 50px;
+      transition: border-color 0.3s;
+    }
+    .edificio-badge.detectado { border-color: #166534; }
+    .edificio-badge.fuera     { border-color: #7f1d1d; }
+    .edificio-badge.cargando  { border-color: #252540; }
+
+    .gps-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #374151;
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .edificio-badge.detectado .gps-dot { background: #22c55e; }
+    .edificio-badge.fuera .gps-dot     { background: #ef4444; }
+    .edificio-badge.cargando .gps-dot  { background: #f59e0b; animation: pulse 1.2s infinite; }
+
+    .edificio-info { flex: 1; }
+    .edificio-nombre { font-size: 14px; color: #e8e8f0; }
+    .edificio-sub    { font-size: 11px; color: #4b5563; margin-top: 2px; }
+
+    .gps-precision { font-size: 11px; color: #374151; white-space: nowrap; }
+
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+    /* ── Cámara ── */
+    .camara-wrapper {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #0a0a14;
+      aspect-ratio: 4/3;
+    }
+    #video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      display: block;
+    }
+    .camara-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10,10,20,0.7);
+      font-size: 13px;
+      color: #6b7280;
+      text-align: center;
+      padding: 20px;
+    }
+    .camara-overlay.oculto { display: none; }
+
+    /* Guía de encuadre */
+    .face-guide {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -55%);
+      width: 110px; height: 130px;
+      border: 2px solid rgba(99,102,241,0.4);
+      border-radius: 55px / 65px;
+      pointer-events: none;
+    }
+
+    /* ── Botones de evento ── */
+    .eventos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn-evento {
+      padding: 18px 10px;
+      border: none;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      letter-spacing: 0.3px;
+      line-height: 1.3;
+    }
+    .btn-evento .evento-hora { font-size: 10px; font-weight: 400; opacity: 0.7; display: block; margin-top: 3px; }
+    .btn-evento:active { transform: scale(0.96); }
+    .btn-evento:disabled { opacity: 0.25; cursor: not-allowed; transform: none; }
+    .btn-entrada  { background: #22c55e; color: #052e16; }
+    .btn-ini-com  { background: #f59e0b; color: #1c0a00; }
+    .btn-fin-com  { background: #3b82f6; color: #e0f0ff; }
+    .btn-salida   { background: #ef4444; color: #fff0f0; }
+
+    /* ── Estado / feedback ── */
+    #estado {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      text-align: center;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f0f1a;
+      border: 1px solid #252540;
+      color: #6b7280;
+      line-height: 1.4;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    #estado.ok       { color: #22c55e; border-color: #166534; }
+    #estado.error    { color: #ef4444; border-color: #7f1d1d; }
+    #estado.cargando { color: #6366f1; border-color: #312e81; }
+
+    /* ── Offline ── */
+    #offline-bar {
+      width: 100%;
+      max-width: 400px;
+      background: #1c1200;
+      border: 1px solid #78350f;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #fbbf24;
+      text-align: center;
+      margin-bottom: 12px;
+      display: none;
+    }
+    #offline-bar.visible { display: block; }
+
+    /* ── Registro múltiple en el mismo día ── */
+    .multi-turno-hint {
+      font-size: 11px;
+      color: #4b5563;
+      text-align: center;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-header">
+  <span class="app-logo">Asistencia</span>
+  <span class="app-time" id="reloj"></span>
+</div>
+
+<!-- Offline bar -->
+<div id="offline-bar">⚠ Sin conexión — el registro se enviará cuando recuperes señal</div>
+
+<!-- ── 1. Empleado ── -->
+<div class="card">
+  <p class="card-label">¿Quién eres?</p>
+  <div class="search-wrapper" id="search-wrapper">
+    <input
+      type="text"
+      id="busqueda"
+      class="search-input"
+      placeholder="Busca tu nombre o número de empleado..."
+      autocomplete="off"
+      spellcheck="false"
+    >
+    <div id="dropdown" class="dropdown"></div>
+  </div>
+  <div class="empleado-confirmado" id="empleado-confirmado">
+    <div class="check-emp">
+      <svg viewBox="0 0 12 12" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round">
+        <polyline points="2,6 5,9 10,3"/>
+      </svg>
+    </div>
+    <div>
+      <div class="emp-nombre" id="emp-nombre-display"></div>
+      <div class="emp-id-small" id="emp-id-display"></div>
+    </div>
+    <button class="btn-cambiar" onclick="resetEmpleado()">Cambiar</button>
+  </div>
+</div>
+
+<!-- ── 2. Turno ── -->
+<div class="card" id="card-turno">
+  <p class="card-label">Turno de este registro</p>
+  <div class="turno-grid">
+    <button class="btn-turno" id="btn-mat" onclick="seleccionarTurno('Matutino')">
+      Matutino
+      <div class="turno-horas">7:00 – 15:00</div>
+    </button>
+    <button class="btn-turno" id="btn-ves" onclick="seleccionarTurno('Vespertino')">
+      Vespertino
+      <div class="turno-horas">14:00 – 22:00</div>
+    </button>
+  </div>
+</div>
+
+<!-- ── 3. Ubicación ── -->
+<div class="card">
+  <p class="card-label">Ubicación</p>
+  <div id="edificio-badge" class="edificio-badge cargando">
+    <span class="gps-dot"></span>
+    <div class="edificio-info">
+      <div class="edificio-nombre" id="edificio-nombre">Detectando GPS...</div>
+      <div class="edificio-sub"   id="edificio-sub"></div>
+    </div>
+    <span class="gps-precision" id="gps-precision"></span>
+  </div>
+</div>
+
+<!-- ── 4. Selfie ── -->
+<div class="card">
+  <p class="card-label">Prueba de presencia</p>
+  <div class="camara-wrapper">
+    <video id="video" autoplay playsinline muted></video>
+    <div class="face-guide"></div>
+    <div class="camara-overlay" id="camara-overlay">
+      Iniciando cámara frontal...
+    </div>
+  </div>
+</div>
+
+<!-- ── 5. Registrar ── -->
+<div class="card">
+  <p class="card-label">Registrar evento</p>
+  <div class="eventos-grid">
+    <button class="btn-evento btn-entrada"  id="btn-entrada"  onclick="registrar('Entrada')"       disabled>
+      Entrada
+      <span class="evento-hora" id="hint-entrada"></span>
+    </button>
+    <button class="btn-evento btn-ini-com"  id="btn-ini-com"  onclick="registrar('Inicio Comida')" disabled>
+      Inicio comida
+    </button>
+    <button class="btn-evento btn-fin-com"  id="btn-fin-com"  onclick="registrar('Fin Comida')"    disabled>
+      Fin comida
+    </button>
+    <button class="btn-evento btn-salida"   id="btn-salida"   onclick="registrar('Salida')"        disabled>
+      Salida
+      <span class="evento-hora" id="hint-salida"></span>
+    </button>
+  </div>
+  <div id="estado">Completa los pasos anteriores para habilitar el registro.</div>
+  <p class="multi-turno-hint">
+    Si trabajas en más de un turno o edificio hoy,<br>haz un registro separado por cada uno.
+  </p>
+</div>
+
+<input type="hidden" id="id_empleado">
+<input type="hidden" id="turno_seleccionado">
+<input type="hidden" id="id_edificio">
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// CONFIGURACIÓN
+// ══════════════════════════════════════════════════════════════
+const API_URL = "PEGA_AQUÍ_TU_URL_DE_APPS_SCRIPT";
+
+// Horarios locales (solo para UX — la validación real es en el servidor)
+const TURNOS_UX = {
+  "Matutino":   { entrada: "7:00",  salida: "15:00" },
+  "Vespertino": { entrada: "14:00", salida: "22:00" }
+};
+
+// ══════════════════════════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════════════════════════
+let empleados          = [];
+let edificios          = [];
+let empleadoSeleccionado = null;
+let turnoSeleccionado    = null;
+let edificioDetectado    = null;
+let gpsActual            = null;  // { lat, lon, precision }
+let camaraLista          = false;
+let enviando             = false;
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+async function inicializar() {
+  iniciarReloj();
+  await cargarCatalogos();
+  iniciarGPS();
+  iniciarCamara();
+  registrarServiceWorker();
+  escucharConectividad();
+  leerParametrosURL();
+  configurarDropdown();
+}
+
+// ══════════════════════════════════════════════════════════════
+// RELOJ EN TIEMPO REAL
+// ══════════════════════════════════════════════════════════════
+function iniciarReloj() {
+  function tick() {
+    const ahora = new Date();
+    document.getElementById("reloj").textContent =
+      ahora.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+// ══════════════════════════════════════════════════════════════
+// CATÁLOGOS (con caché local para offline)
+// ══════════════════════════════════════════════════════════════
+async function cargarCatalogos() {
+  try {
+    const [resEmp, resEdi] = await Promise.all([
+      fetch(API_URL + "?accion=empleados"),
+      fetch(API_URL + "?accion=edificios")
+    ]);
+    if (!resEmp.ok || !resEdi.ok) throw new Error("Error de red");
+    empleados = await resEmp.json();
+    edificios = await resEdi.json();
+    localStorage.setItem("cache_empleados", JSON.stringify(empleados));
+    localStorage.setItem("cache_edificios",  JSON.stringify(edificios));
+  } catch(e) {
+    const cE = localStorage.getItem("cache_empleados");
+    const cD = localStorage.getItem("cache_edificios");
+    if (cE) empleados = JSON.parse(cE);
+    if (cD) edificios = JSON.parse(cD);
+    if (!empleados.length) setEstado("Sin conexión y sin datos en caché. Conéctate e intenta de nuevo.", "error");
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PARÁMETRO NFC (?edificio=ED01 en la URL)
+// ══════════════════════════════════════════════════════════════
+function leerParametrosURL() {
+  const params = new URLSearchParams(window.location.search);
+  const idEd   = params.get("edificio");
+  if (!idEd) return;
+  // Se ejecuta después de que el GPS confirme — solo preselecciona visualmente
+  // La validación real la hace el servidor por GPS
+  const ed = edificios.find(e => e.id === idEd);
+  if (ed) {
+    document.getElementById("edificio-nombre").textContent = ed.nombre + " (vía NFC)";
+    document.getElementById("edificio-sub").textContent    = "Confirmando con GPS...";
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// DROPDOWN CON BÚSQUEDA
+// ══════════════════════════════════════════════════════════════
+function configurarDropdown() {
+  const input = document.getElementById("busqueda");
+  input.addEventListener("input",  filtrarEmpleados);
+  input.addEventListener("focus",  () => { renderDropdown(empleados); abrirDropdown(); });
+  document.addEventListener("click", e => {
+    if (!e.target.closest("#search-wrapper")) cerrarDropdown();
+  });
+}
+
+function renderDropdown(lista) {
+  const dd = document.getElementById("dropdown");
+  if (!lista.length) {
+    dd.innerHTML = '<div class="dropdown-empty">Sin resultados</div>';
+    return;
+  }
+  dd.innerHTML = lista.map(e =>
+    `<div class="dropdown-item" data-id="${e.id}" data-nombre="${e.nombre}"
+          onclick="seleccionarEmpleado('${e.id}','${encodeURIComponent(e.nombre)}')">
+       <div>${e.nombre}</div>
+       <div class="emp-id">${e.id}</div>
+     </div>`
+  ).join("");
+}
+
+function filtrarEmpleados() {
+  const q = document.getElementById("busqueda").value.toLowerCase().trim();
+  const f = q
+    ? empleados.filter(e => e.nombre.toLowerCase().includes(q) || e.id.toLowerCase().includes(q))
+    : empleados;
+  renderDropdown(f);
+  abrirDropdown();
+}
+
+function abrirDropdown() { document.getElementById("dropdown").classList.add("open"); }
+function cerrarDropdown() { document.getElementById("dropdown").classList.remove("open"); }
+
+function seleccionarEmpleado(id, nombreEncoded) {
+  const nombre = decodeURIComponent(nombreEncoded);
+  empleadoSeleccionado = { id, nombre };
+  document.getElementById("id_empleado").value = id;
+
+  // Ocultar buscador, mostrar confirmación
+  document.getElementById("search-wrapper").style.display = "none";
+  document.getElementById("empleado-confirmado").classList.add("visible");
+  document.getElementById("emp-nombre-display").textContent = nombre;
+  document.getElementById("emp-id-display").textContent     = id;
+  cerrarDropdown();
+  verificarListo();
+}
+
+function resetEmpleado() {
+  empleadoSeleccionado = null;
+  document.getElementById("id_empleado").value = "";
+  document.getElementById("busqueda").value    = "";
+  document.getElementById("search-wrapper").style.display = "";
+  document.getElementById("empleado-confirmado").classList.remove("visible");
+  verificarListo();
+}
+
+// ══════════════════════════════════════════════════════════════
+// TURNO
+// ══════════════════════════════════════════════════════════════
+function seleccionarTurno(turno) {
+  turnoSeleccionado = turno;
+  document.getElementById("turno_seleccionado").value = turno;
+  document.getElementById("btn-mat").classList.toggle("selected", turno === "Matutino");
+  document.getElementById("btn-ves").classList.toggle("selected", turno === "Vespertino");
+
+  // Mostrar horas de referencia en los botones de evento
+  const t = TURNOS_UX[turno];
+  document.getElementById("hint-entrada").textContent = "Hora: " + t.entrada;
+  document.getElementById("hint-salida").textContent  = "Hora: " + t.salida;
+
+  verificarListo();
+}
+
+// ══════════════════════════════════════════════════════════════
+// GPS Y GEOFENCE (watchPosition — actualización continua)
+// ══════════════════════════════════════════════════════════════
+function iniciarGPS() {
+  if (!navigator.geolocation) {
+    setEdificio("fuera", "GPS no disponible", "Este dispositivo no soporta geolocalización.");
+    return;
+  }
+  navigator.geolocation.watchPosition(
+    pos => procesarGPS(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
+    err => {
+      const msgs = {
+        1: "Permiso de ubicación denegado. Ve a ajustes del navegador y permite el acceso.",
+        2: "No se pudo obtener la ubicación. Sal a un área con mejor señal.",
+        3: "Tiempo de espera agotado. Reintentando..."
+      };
+      setEdificio("fuera", "Error de GPS", msgs[err.code] || "Error desconocido de GPS.");
+    },
+    { enableHighAccuracy: true, maximumAge: 20000, timeout: 15000 }
+  );
+}
+
+function procesarGPS(lat, lon, precision) {
+  gpsActual = { lat, lon, precision };
+  const precTexto = "±" + Math.round(precision) + "m";
+  document.getElementById("gps-precision").textContent = precTexto;
+
+  if (precision > 150) {
+    setEdificio("cargando", "Señal GPS débil (" + precTexto + ")", "Sal a exteriores para mejorar la precisión.");
+    edificioDetectado = null;
+    verificarListo();
+    return;
+  }
+
+  let masCercano = null, distMin = Infinity;
+  edificios.forEach(ed => {
+    const d = haversine(lat, lon, ed.lat, ed.lon);
+    if (d < distMin) { distMin = d; masCercano = ed; }
+  });
+
+  const radio = masCercano ? (masCercano.radio || 100) : 100;
+
+  if (masCercano && distMin <= radio) {
+    edificioDetectado = masCercano;
+    document.getElementById("id_edificio").value = masCercano.id;
+    setEdificio("detectado", masCercano.nombre, "A " + Math.round(distMin) + "m del punto de registro");
+  } else {
+    edificioDetectado = null;
+    document.getElementById("id_edificio").value = "";
+    const sub = masCercano
+      ? "Más cercano: " + masCercano.nombre + " (" + Math.round(distMin) + "m — fuera de rango)"
+      : "No hay edificios registrados cerca.";
+    setEdificio("fuera", "Fuera de área", sub);
+  }
+  verificarListo();
+}
+
+function setEdificio(estado, nombre, sub) {
+  const badge = document.getElementById("edificio-badge");
+  badge.className = "edificio-badge " + estado;
+  document.getElementById("edificio-nombre").textContent = nombre;
+  document.getElementById("edificio-sub").textContent    = sub || "";
+}
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R  = 6371000;
+  const p1 = lat1 * Math.PI / 180, p2 = lat2 * Math.PI / 180;
+  const dp = (lat2 - lat1) * Math.PI / 180, dl = (lon2 - lon1) * Math.PI / 180;
+  const a  = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// ══════════════════════════════════════════════════════════════
+// CÁMARA
+// ══════════════════════════════════════════════════════════════
+async function iniciarCamara() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false
+    });
+    const video = document.getElementById("video");
+    video.srcObject = stream;
+    video.addEventListener("loadedmetadata", () => {
+      document.getElementById("camara-overlay").classList.add("oculto");
+      camaraLista = true;
+      verificarListo();
+    });
+  } catch(e) {
+    document.getElementById("camara-overlay").textContent =
+      "Sin acceso a la cámara. Permite el permiso en tu navegador y recarga la página.";
+    camaraLista = false;
+  }
+}
+
+function capturarSelfie() {
+  const video  = document.getElementById("video");
+  const canvas = document.createElement("canvas");
+  canvas.width  = 320;
+  canvas.height = 240;
+  const ctx = canvas.getContext("2d");
+  ctx.translate(320, 0);
+  ctx.scale(-1, 1); // espejo para que la selfie salga correcta
+  ctx.drawImage(video, 0, 0, 320, 240);
+  return canvas.toDataURL("image/jpeg", 0.55); // ~35–55 KB
+}
+
+// ══════════════════════════════════════════════════════════════
+// HABILITAR BOTONES
+// ══════════════════════════════════════════════════════════════
+function verificarListo() {
+  const listo = empleadoSeleccionado && turnoSeleccionado && edificioDetectado && camaraLista;
+  ["btn-entrada","btn-ini-com","btn-fin-com","btn-salida"].forEach(id => {
+    document.getElementById(id).disabled = !listo;
+  });
+  if (listo && document.getElementById("estado").className === "") {
+    setEstado("Todo listo — selecciona el tipo de registro.", "");
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// REGISTRO
+// ══════════════════════════════════════════════════════════════
+async function registrar(evento) {
+  if (enviando) return;
+
+  // Validación final en cliente (el servidor también valida)
+  if (!empleadoSeleccionado) { setEstado("Selecciona tu nombre primero.", "error"); return; }
+  if (!turnoSeleccionado)    { setEstado("Selecciona el turno de este registro.", "error"); return; }
+  if (!edificioDetectado)    { setEstado("No estás dentro del área de trabajo.", "error"); return; }
+  if (!camaraLista)          { setEstado("La cámara no está lista.", "error"); return; }
+
+  enviando = true;
+  setEstado("Capturando selfie y enviando registro...", "cargando");
+  deshabilitarBotones(true);
+
+  const selfie = capturarSelfie();
+
+  const payload = {
+    id_empleado: empleadoSeleccionado.id,
+    nombre:      empleadoSeleccionado.nombre,
+    turno:       turnoSeleccionado,
+    evento:      evento,
+    latitud:     gpsActual ? gpsActual.lat : null,
+    longitud:    gpsActual ? gpsActual.lon : null,
+    precision:   gpsActual ? gpsActual.precision : null,
+    selfie:      selfie
+  };
+
+  if (navigator.onLine) {
+    await enviarRegistro(payload);
+  } else {
+    guardarEnCola(payload);
+    setEstado("Sin conexión. El registro se guardó localmente y se enviará cuando recuperes señal.", "error");
+  }
+
+  enviando = false;
+  deshabilitarBotones(false);
+}
+
+async function enviarRegistro(payload) {
+  try {
+    const res  = await fetch(API_URL, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.status === "OK") {
+      setEstado("✓ " + data.mensaje, "ok");
+    } else {
+      setEstado("✗ " + data.mensaje, "error");
+    }
+  } catch(e) {
+    guardarEnCola(payload);
+    setEstado("Error de red. Registro guardado para reintento automático.", "error");
+  }
+}
+
+function deshabilitarBotones(deshabilitar) {
+  ["btn-entrada","btn-ini-com","btn-fin-com","btn-salida"].forEach(id => {
+    document.getElementById(id).disabled = deshabilitar;
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// COLA OFFLINE
+// ══════════════════════════════════════════════════════════════
+function guardarEnCola(payload) {
+  const cola = JSON.parse(localStorage.getItem("cola_offline") || "[]");
+  cola.push({ payload, ts_local: Date.now() });
+  localStorage.setItem("cola_offline", JSON.stringify(cola));
+}
+
+async function procesarCola() {
+  const cola = JSON.parse(localStorage.getItem("cola_offline") || "[]");
+  if (!cola.length) return;
+  const pendientes = [];
+  for (const item of cola) {
+    try {
+      const res  = await fetch(API_URL, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(item.payload)
+      });
+      const data = await res.json();
+      if (data.status !== "OK") pendientes.push(item);
+    } catch(e) {
+      pendientes.push(item);
+    }
+  }
+  localStorage.setItem("cola_offline", JSON.stringify(pendientes));
+  const enviados = cola.length - pendientes.length;
+  if (enviados > 0) {
+    console.log("Cola offline: " + enviados + " registro(s) enviado(s).");
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONECTIVIDAD
+// ══════════════════════════════════════════════════════════════
+function escucharConectividad() {
+  const bar = document.getElementById("offline-bar");
+  window.addEventListener("online",  () => { bar.classList.remove("visible"); procesarCola(); });
+  window.addEventListener("offline", () =>   bar.classList.add("visible"));
+  if (!navigator.onLine) bar.classList.add("visible");
+}
+
+// ══════════════════════════════════════════════════════════════
+// SERVICE WORKER
+// ══════════════════════════════════════════════════════════════
+function registrarServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(e => console.warn("SW:", e));
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════
+function setEstado(msg, tipo) {
+  const el = document.getElementById("estado");
+  el.textContent = msg;
+  el.className   = tipo;
+}
+
+// ══════════════════════════════════════════════════════════════
+inicializar();
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "Registro de Asistencia",
+  "short_name": "Asistencia",
+  "description": "Sistema de registro de asistencia con geofencing y selfie",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f0f1a",
+  "theme_color": "#0f0f1a",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f0f1a'/><text y='68' x='50' text-anchor='middle' font-size='55'>🏢</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
