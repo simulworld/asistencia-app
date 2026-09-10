@@ -109,7 +109,7 @@
     .btn-turno.selected { background: #1e1e40; border-color: #6366f1; color: #a5b4fc; }
     .btn-turno.selected .turno-horas { color: #6366f1; }
 
-    /* ── Edificio ── */
+    /* ── Edificio (caso único / confirmado) ── */
     .edificio-badge {
       display: flex; align-items: center; gap: 12px;
       padding: 13px 16px; background: #0f0f1a;
@@ -126,11 +126,32 @@
     .edificio-badge.detectado .gps-dot { background: #22c55e; }
     .edificio-badge.fuera     .gps-dot { background: #ef4444; }
     .edificio-badge.cargando  .gps-dot { background: #f59e0b; animation: pulse 1.2s infinite; }
-    .edificio-info { flex: 1; }
+    .edificio-info { flex: 1; min-width: 0; }
     .edificio-nombre { font-size: 14px; color: #e8e8f0; }
     .edificio-sub    { font-size: 11px; color: #4b5563; margin-top: 2px; }
     .gps-precision   { font-size: 11px; color: #374151; white-space: nowrap; }
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+    .btn-cambiar-edificio {
+      background: none; border: none; color: #6366f1;
+      font-size: 11px; cursor: pointer; padding: 2px 0;
+      text-decoration: underline; margin-top: 4px;
+    }
+
+    /* ── Picker de edificio (múltiples coincidencias) ── */
+    .edificio-picker { display: flex; flex-direction: column; gap: 8px; }
+    .edificio-picker-hint {
+      font-size: 12px; color: #f59e0b; margin-bottom: 4px; line-height: 1.5;
+    }
+    .btn-edificio-opcion {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 16px; background: #0f0f1a;
+      border: 1.5px solid #252540; border-radius: 10px;
+      color: #e8e8f0; font-size: 14px; text-align: left;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-edificio-opcion:hover, .btn-edificio-opcion:active { border-color: #6366f1; background: #1a1a30; }
+    .btn-edificio-opcion .opcion-dist { font-size: 11px; color: #4b5563; white-space: nowrap; margin-left: 10px; }
 
     /* ── Cámara ── */
     .camara-wrapper {
@@ -209,33 +230,21 @@
       margin-top: 10px; line-height: 1.5;
     }
 
-    /* ══════════════════════════════════════════════
-       MODAL DE CONFIRMACIÓN
-    ══════════════════════════════════════════════ */
+    /* ══ MODAL DE CONFIRMACIÓN ══ */
     .modal-backdrop {
-      position: fixed; inset: 0;
-      background: rgba(5,5,15,0.85);
-      backdrop-filter: blur(4px);
-      z-index: 500;
+      position: fixed; inset: 0; background: rgba(5,5,15,0.85);
+      backdrop-filter: blur(4px); z-index: 500;
       display: flex; align-items: flex-end; justify-content: center;
-      padding: 20px;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.2s;
+      padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s;
     }
     .modal-backdrop.visible { opacity: 1; pointer-events: all; }
     .modal {
       background: #1e1e38; border: 1px solid #2d2d50;
-      border-radius: 20px; padding: 24px;
-      width: 100%; max-width: 400px;
-      transform: translateY(30px);
-      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      border-radius: 20px; padding: 24px; width: 100%; max-width: 400px;
+      transform: translateY(30px); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
     }
     .modal-backdrop.visible .modal { transform: translateY(0); }
-
-    .modal-titulo {
-      font-size: 11px; letter-spacing: 1.8px; color: #4b5563;
-      text-transform: uppercase; margin-bottom: 16px;
-    }
+    .modal-titulo { font-size: 11px; letter-spacing: 1.8px; color: #4b5563; text-transform: uppercase; margin-bottom: 16px; }
     .modal-evento-badge {
       display: flex; align-items: center; justify-content: center;
       padding: 18px; border-radius: 14px; margin-bottom: 16px;
@@ -245,23 +254,18 @@
     .modal-evento-badge.ini-com { background:#1c0a00; color:#f59e0b; border:1.5px solid #92400e; }
     .modal-evento-badge.fin-com { background:#0c1a2e; color:#3b82f6; border:1.5px solid #1d4ed8; }
     .modal-evento-badge.salida  { background:#1c0505; color:#ef4444; border:1.5px solid #991b1b; }
-
     .modal-resumen {
-      background: #0f0f1a; border: 1px solid #252540;
-      border-radius: 12px; padding: 14px 16px;
-      margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px;
+      background: #0f0f1a; border: 1px solid #252540; border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px;
     }
-    .resumen-fila {
-      display: flex; justify-content: space-between; align-items: baseline; font-size: 13px;
-    }
+    .resumen-fila { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; }
     .resumen-label { color: #4b5563; font-size: 11px; }
     .resumen-valor { color: #e8e8f0; font-weight: 500; text-align: right; max-width: 220px; }
-
     .modal-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btn-modal-cancelar {
       padding: 15px; border: 1.5px solid #252540; border-radius: 12px;
-      background: transparent; color: #6b7280; font-size: 15px;
-      font-weight: 600; cursor: pointer; transition: all 0.15s;
+      background: transparent; color: #6b7280; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
     }
     .btn-modal-cancelar:hover { background: #252540; color: #e8e8f0; }
     .btn-modal-confirmar {
@@ -275,11 +279,7 @@
     .btn-modal-confirmar.ini-com { background:#f59e0b; color:#1c0a00; }
     .btn-modal-confirmar.fin-com { background:#3b82f6; color:#e0f0ff; }
     .btn-modal-confirmar.salida  { background:#ef4444; color:#fff0f0; }
-
-    .modal-advertencia {
-      font-size: 11px; color: #4b5563; text-align: center;
-      margin-top: 12px; line-height: 1.5;
-    }
+    .modal-advertencia { font-size: 11px; color: #4b5563; text-align: center; margin-top: 12px; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -291,7 +291,6 @@
 
 <div id="offline-bar">⚠ Sin conexión — el registro se enviará cuando recuperes señal</div>
 
-<!-- ── Aviso si catálogos no cargan ── -->
 <div class="card" id="card-aviso-catalogo">
   <div class="catalogo-aviso">
     ⚠ No se pudo conectar al servidor para cargar los catálogos.<br><br>
@@ -338,16 +337,27 @@
   </div>
 </div>
 
-<!-- ── 3. Ubicación ── -->
+<!-- ── 3. Ubicación (badge único O picker múltiple) ── -->
 <div class="card">
   <p class="card-label">Ubicación</p>
+
   <div id="edificio-badge" class="edificio-badge cargando">
     <span class="gps-dot"></span>
     <div class="edificio-info">
       <div class="edificio-nombre" id="edificio-nombre">Detectando GPS...</div>
       <div class="edificio-sub"   id="edificio-sub">Mantén la app abierta unos segundos</div>
+      <button class="btn-cambiar-edificio" id="btn-cambiar-edificio" style="display:none" onclick="mostrarPickerEdificio()">
+        Cambiar ubicación
+      </button>
     </div>
     <span class="gps-precision" id="gps-precision"></span>
+  </div>
+
+  <div class="edificio-picker" id="edificio-picker" style="display:none">
+    <p class="edificio-picker-hint">
+      Detectamos más de una opción en este punto. Selecciona dónde estás:
+    </p>
+    <div id="edificio-opciones"></div>
   </div>
 </div>
 
@@ -367,7 +377,7 @@
   <div class="checklist">
     <div class="check-item" id="chk-empleado"><span class="check-dot"></span>Empleado seleccionado</div>
     <div class="check-item" id="chk-turno">   <span class="check-dot"></span>Turno elegido</div>
-    <div class="check-item" id="chk-gps">     <span class="check-dot"></span>Dentro del área de trabajo</div>
+    <div class="check-item" id="chk-gps">     <span class="check-dot"></span>Ubicación confirmada</div>
     <div class="check-item" id="chk-camara">  <span class="check-dot"></span>Cámara activa</div>
   </div>
   <div class="eventos-grid">
@@ -408,7 +418,7 @@
         <span class="resumen-valor" id="modal-turno"></span>
       </div>
       <div class="resumen-fila">
-        <span class="resumen-label">Edificio</span>
+        <span class="resumen-label">Ubicación</span>
         <span class="resumen-valor" id="modal-edificio"></span>
       </div>
       <div class="resumen-fila">
@@ -433,7 +443,7 @@
 <script>
 // ══════════════════════════════════════════════════════════════
 // ⚠ ÚNICA LÍNEA QUE DEBES EDITAR:
-const API_URL = "https://script.google.com/macros/s/AKfycbwOuQEMMJE516Lt_nDVxi8dwfzZXUstButwmCC288fB4XECxSCYcxniJHOuFTAOr0hQ_g/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxJYRYaJ36zlE5Fk2zGRuD_VygvMwF59VcCawL__pVHo5E3QjzAjj4IYvnehKuBJVbtpw/exec";
 // ══════════════════════════════════════════════════════════════
 
 const TURNOS_UX = {
@@ -449,26 +459,28 @@ const EVENTOS_CONFIG = {
 };
 
 let empleados            = [];
-let edificios            = [];
-let empleadoSeleccionado = null;
-let turnoSeleccionado    = null;
-let edificioDetectado    = null;
-let gpsActual            = null;
-let camaraLista          = false;
-let enviando             = false;
-let eventoEnEspera       = null;
+let edificios             = [];
+let empleadoSeleccionado  = null;
+let turnoSeleccionado     = null;
+let edificioDetectado     = null;   // el edificio finalmente elegido (auto o manual)
+let candidatosActuales    = [];     // edificios dentro del geofence en el último GPS
+let idEdificioNFC         = null;   // ?edificio=ED0X de la URL, si existe
+let gpsActual             = null;
+let camaraLista           = false;
+let enviando              = false;
+let eventoEnEspera        = null;
 
 // ══════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════
 async function inicializar() {
   iniciarReloj();
+  leerParametrosURL();       // lee ?edificio= ANTES de que llegue el primer GPS
   await cargarCatalogos();
   iniciarGPS();
   iniciarCamara();
   registrarServiceWorker();
   escucharConectividad();
-  leerParametrosURL();
   configurarDropdown();
 }
 
@@ -477,8 +489,8 @@ async function inicializar() {
 // ══════════════════════════════════════════════════════════════
 function iniciarReloj() {
   function tick() {
-    const hora = new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
-    document.getElementById("reloj").textContent = hora;
+    document.getElementById("reloj").textContent =
+      new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
     const mh = document.getElementById("modal-hora");
     if (mh) mh.textContent = new Date().toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit" });
   }
@@ -486,7 +498,7 @@ function iniciarReloj() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// CATÁLOGOS — con caché local para uso offline
+// CATÁLOGOS
 // ══════════════════════════════════════════════════════════════
 async function cargarCatalogos() {
   document.getElementById("card-aviso-catalogo").style.display = "none";
@@ -511,7 +523,6 @@ async function cargarCatalogos() {
   } catch(e) {
     console.warn("Servidor no disponible:", e.message);
   }
-  // Fallback a caché local
   const cE = localStorage.getItem("cache_empleados");
   const cD = localStorage.getItem("cache_edificios");
   if (cE) empleados = JSON.parse(cE);
@@ -531,21 +542,15 @@ async function reintentarCatalogos() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// PARÁMETRO NFC (?edificio=ED01 en la URL)
+// PARÁMETRO NFC (?edificio=ED01)
 // ══════════════════════════════════════════════════════════════
 function leerParametrosURL() {
   const params = new URLSearchParams(window.location.search);
-  const idEd   = params.get("edificio");
-  if (!idEd) return;
-  const ed = edificios.find(e => e.id === idEd);
-  if (ed) {
-    document.getElementById("edificio-nombre").textContent = ed.nombre + " (vía NFC)";
-    document.getElementById("edificio-sub").textContent    = "Confirmando con GPS...";
-  }
+  idEdificioNFC = params.get("edificio") || null;
 }
 
 // ══════════════════════════════════════════════════════════════
-// DROPDOWN CON BÚSQUEDA
+// DROPDOWN DE EMPLEADO
 // ══════════════════════════════════════════════════════════════
 function configurarDropdown() {
   const input = document.getElementById("busqueda");
@@ -619,7 +624,7 @@ function seleccionarTurno(turno) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// GPS Y GEOFENCE
+// GPS — ahora detecta y maneja MÚLTIPLES coincidencias
 // ══════════════════════════════════════════════════════════════
 function iniciarGPS() {
   if (!navigator.geolocation) {
@@ -635,7 +640,7 @@ function iniciarGPS() {
         3: "Tiempo agotado. Reintentando..."
       };
       setEdificio("fuera", "Error de GPS", msgs[err.code] || "Error de GPS.");
-      edificioDetectado = null; actualizarChecklist();
+      edificioDetectado = null; ocultarPicker(); actualizarChecklist();
     },
     { enableHighAccuracy: true, maximumAge: 20000, timeout: 15000 }
   );
@@ -647,36 +652,94 @@ function procesarGPS(lat, lon, precision) {
 
   if (precision > 150) {
     setEdificio("cargando", "Señal GPS débil (±" + Math.round(precision) + "m)", "Sal a exteriores para mejorar la señal.");
-    edificioDetectado = null; actualizarChecklist(); return;
+    edificioDetectado = null; ocultarPicker(); actualizarChecklist();
+    return;
   }
 
-  let masCercano = null, distMin = Infinity;
-  edificios.forEach(ed => {
-    const d = haversine(lat, lon, ed.lat, ed.lon);
-    if (d < distMin) { distMin = d; masCercano = ed; }
-  });
+  // Encuentra TODOS los edificios cuyo radio cubre la posición actual
+  candidatosActuales = edificios
+    .map(ed => ({ ...ed, dist: haversine(lat, lon, ed.lat, ed.lon) }))
+    .filter(ed => ed.dist <= (ed.radio || 100))
+    .sort((a, b) => a.dist - b.dist);
 
-  const radio = (masCercano && masCercano.radio) ? masCercano.radio : 100;
-
-  if (masCercano && distMin <= radio) {
-    edificioDetectado = masCercano;
-    document.getElementById("id_edificio").value = masCercano.id;
-    setEdificio("detectado", masCercano.nombre, "A " + Math.round(distMin) + "m del punto de registro");
-  } else {
+  if (candidatosActuales.length === 0) {
     edificioDetectado = null;
     document.getElementById("id_edificio").value = "";
-    const sub = masCercano
-      ? "Más cercano: " + masCercano.nombre + " (" + Math.round(distMin) + "m, fuera de rango)"
-      : "No hay edificios registrados cerca.";
-    setEdificio("fuera", "Fuera de área", sub);
+    ocultarPicker();
+    setEdificio("fuera", "Fuera de área", "No hay ningún punto de registro cerca de tu ubicación.");
+
+  } else if (candidatosActuales.length === 1) {
+    // Caso normal — un solo edificio en este punto, auto-selección
+    edificioDetectado = candidatosActuales[0];
+    document.getElementById("id_edificio").value = edificioDetectado.id;
+    ocultarPicker();
+    setEdificio("detectado", edificioDetectado.nombre,
+      "A " + Math.round(edificioDetectado.dist) + "m del punto de registro");
+
+  } else {
+    // Múltiples coincidencias — mismo punto, distintos clientes/pisos
+    const yaEligioValido = edificioDetectado &&
+      candidatosActuales.find(c => c.id === edificioDetectado.id);
+
+    if (yaEligioValido) {
+      // El empleado ya había elegido y su elección sigue siendo válida
+      edificioDetectado = candidatosActuales.find(c => c.id === edificioDetectado.id);
+      document.getElementById("id_edificio").value = edificioDetectado.id;
+      ocultarPicker();
+      setEdificio("detectado", edificioDetectado.nombre,
+        "A " + Math.round(edificioDetectado.dist) + "m — hay otras opciones aquí", true);
+
+    } else if (idEdificioNFC && candidatosActuales.find(c => c.id === idEdificioNFC)) {
+      // La etiqueta NFC escaneada preselecciona la opción correcta
+      edificioDetectado = candidatosActuales.find(c => c.id === idEdificioNFC);
+      document.getElementById("id_edificio").value = edificioDetectado.id;
+      ocultarPicker();
+      setEdificio("detectado", edificioDetectado.nombre + " (vía NFC)",
+        "A " + Math.round(edificioDetectado.dist) + "m del punto de registro", true);
+
+    } else {
+      // No hay elección previa ni NFC — el empleado debe elegir
+      edificioDetectado = null;
+      document.getElementById("id_edificio").value = "";
+      mostrarPickerEdificio();
+    }
   }
   actualizarChecklist();
 }
 
-function setEdificio(estado, nombre, sub) {
+function setEdificio(estado, nombre, sub, mostrarCambiar) {
+  document.getElementById("edificio-badge").style.display = "flex";
   document.getElementById("edificio-badge").className = "edificio-badge " + estado;
   document.getElementById("edificio-nombre").textContent = nombre;
   document.getElementById("edificio-sub").textContent    = sub || "";
+  document.getElementById("btn-cambiar-edificio").style.display = mostrarCambiar ? "block" : "none";
+}
+
+function mostrarPickerEdificio() {
+  document.getElementById("edificio-badge").style.display = "none";
+  document.getElementById("edificio-picker").style.display = "flex";
+  const cont = document.getElementById("edificio-opciones");
+  cont.innerHTML = candidatosActuales.map(c =>
+    `<button class="btn-edificio-opcion" onclick="elegirEdificio('${c.id}')">
+       <span>${c.nombre}</span>
+       <span class="opcion-dist">${Math.round(c.dist)}m</span>
+     </button>`
+  ).join("");
+}
+
+function ocultarPicker() {
+  document.getElementById("edificio-picker").style.display = "none";
+}
+
+function elegirEdificio(id) {
+  const elegido = candidatosActuales.find(c => c.id === id);
+  if (!elegido) return;
+  edificioDetectado = elegido;
+  document.getElementById("id_edificio").value = elegido.id;
+  ocultarPicker();
+  setEdificio("detectado", elegido.nombre,
+    "A " + Math.round(elegido.dist) + "m — hay otras opciones aquí", true);
+  actualizarChecklist();
 }
 
 function haversine(lat1, lon1, lat2, lon2) {
@@ -712,7 +775,7 @@ async function iniciarCamara() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// CHECKLIST Y HABILITACIÓN DE BOTONES
+// CHECKLIST
 // ══════════════════════════════════════════════════════════════
 function actualizarChecklist() {
   const estados = {
@@ -732,7 +795,7 @@ function actualizarChecklist() {
     const faltantes = [];
     if (!empleadoSeleccionado) faltantes.push("selecciona tu nombre");
     if (!turnoSeleccionado)    faltantes.push("elige el turno");
-    if (!edificioDetectado)    faltantes.push("acércate al edificio");
+    if (!edificioDetectado)    faltantes.push("confirma tu ubicación");
     if (!camaraLista)          faltantes.push("permite la cámara");
     setEstado("Falta: " + faltantes.join(" · "), "");
   } else {
@@ -761,8 +824,8 @@ function pedirConfirmacion(evento) {
 
   const btnConf = document.getElementById("btn-modal-confirmar");
   btnConf.className   = "btn-modal-confirmar " + cfg.clase;
-  btnConf.textContent = "Confirmar " + cfg.etiqueta;
-  btnConf.disabled    = false;
+  btnConf.textContent  = "Confirmar " + cfg.etiqueta;
+  btnConf.disabled     = false;
 
   document.getElementById("modal-backdrop").classList.add("visible");
 }
@@ -788,6 +851,7 @@ async function confirmarRegistro() {
   const payload = {
     id_empleado: empleadoSeleccionado.id,
     nombre:      empleadoSeleccionado.nombre,
+    id_edificio: edificioDetectado.id,
     turno:       turnoSeleccionado,
     evento:      evento,
     latitud:     gpsActual ? gpsActual.lat       : null,
@@ -807,24 +871,26 @@ async function confirmarRegistro() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// ENVÍO VÍA GET (evita problemas de CORS con Apps Script)
+// ENVÍO VÍA GET
 // ══════════════════════════════════════════════════════════════
+function construirParams(payload) {
+  return new URLSearchParams({
+    accion:      "registro",
+    id_empleado: payload.id_empleado,
+    nombre:      payload.nombre,
+    id_edificio: payload.id_edificio,
+    turno:       payload.turno,
+    evento:      payload.evento,
+    latitud:     payload.latitud   !== null ? payload.latitud   : "",
+    longitud:    payload.longitud  !== null ? payload.longitud  : "",
+    precision:   payload.precision !== null ? payload.precision : ""
+  });
+}
+
 async function enviarRegistro(payload) {
   try {
-    const params = new URLSearchParams({
-      accion:      "registro",
-      id_empleado: payload.id_empleado,
-      nombre:      payload.nombre,
-      turno:       payload.turno,
-      evento:      payload.evento,
-      latitud:     payload.latitud   !== null ? payload.latitud   : "",
-      longitud:    payload.longitud  !== null ? payload.longitud  : "",
-      precision:   payload.precision !== null ? payload.precision : ""
-    });
-
-    const res  = await fetch(API_URL + "?" + params.toString());
+    const res  = await fetch(API_URL + "?" + construirParams(payload).toString());
     const data = await res.json();
-
     if (data.status === "OK") {
       setEstado("✓ " + data.mensaje, "ok");
     } else {
@@ -837,7 +903,7 @@ async function enviarRegistro(payload) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// COLA OFFLINE — guarda en localStorage y reintenta al reconectar
+// COLA OFFLINE
 // ══════════════════════════════════════════════════════════════
 function guardarEnCola(payload) {
   const cola = JSON.parse(localStorage.getItem("cola_offline") || "[]");
@@ -851,22 +917,10 @@ async function procesarCola() {
   const pendientes = [];
   for (const item of cola) {
     try {
-      const params = new URLSearchParams({
-        accion:      "registro",
-        id_empleado: item.payload.id_empleado,
-        nombre:      item.payload.nombre,
-        turno:       item.payload.turno,
-        evento:      item.payload.evento,
-        latitud:     item.payload.latitud   !== null ? item.payload.latitud   : "",
-        longitud:    item.payload.longitud  !== null ? item.payload.longitud  : "",
-        precision:   item.payload.precision !== null ? item.payload.precision : ""
-      });
-      const res  = await fetch(API_URL + "?" + params.toString());
+      const res  = await fetch(API_URL + "?" + construirParams(item.payload).toString());
       const data = await res.json();
       if (data.status !== "OK") pendientes.push(item);
-    } catch(e) {
-      pendientes.push(item);
-    }
+    } catch(e) { pendientes.push(item); }
   }
   localStorage.setItem("cola_offline", JSON.stringify(pendientes));
 }
