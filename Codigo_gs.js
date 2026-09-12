@@ -14,7 +14,8 @@ const CORREOS_REPORTE = [
 
 const TURNOS = {
   "Matutino":   { entrada: { h: 7,  m: 0 }, salida: { h: 15, m: 0 }, tolerancia_min: 10 },
-  "Vespertino": { entrada: { h: 14, m: 0 }, salida: { h: 22, m: 0 }, tolerancia_min: 10 }
+  "Mixto":      { entrada: { h: 7,  m: 0 }, salida: { h: 17, m: 0 }, tolerancia_min: 10 },
+  "Vespertino": { entrada: { h: 13, m: 0 }, salida: { h: 21, m: 0 }, tolerancia_min: 10 }
 };
 
 // ════════════════════════════════════════════════════════════════

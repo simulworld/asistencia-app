@@ -25,15 +25,15 @@
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 20px;
     }
-    .app-logo { font-size: 11px; letter-spacing: 2px; color: #4b5563; text-transform: uppercase; }
-    .app-time  { font-size: 13px; color: #6b7280; font-variant-numeric: tabular-nums; }
+    .app-logo { font-size: 11px; letter-spacing: 2px; color: #a8b0c3; text-transform: uppercase; }
+    .app-time  { font-size: 13px; color: #b7bed0; font-variant-numeric: tabular-nums; }
 
     .card {
-      background: #16162a; border: 1px solid #252540; border-radius: 16px;
+      background: #16162a; border: 1px solid #3d3d68; border-radius: 16px;
       padding: 20px; width: 100%; max-width: 400px; margin-bottom: 12px;
     }
     .card-label {
-      font-size: 10px; letter-spacing: 1.8px; color: #4b5563;
+      font-size: 10px; letter-spacing: 1.8px; color: #a8b0c3; font-weight: 700;
       text-transform: uppercase; margin-bottom: 12px;
     }
 
@@ -41,7 +41,7 @@
     .checklist { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
     .check-item {
       display: flex; align-items: center; gap: 10px;
-      font-size: 12px; color: #4b5563; transition: color 0.2s;
+      font-size: 12px; color: #a8b0c3; transition: color 0.2s;
     }
     .check-item.ok { color: #22c55e; }
     .check-dot {
@@ -54,16 +54,16 @@
     .search-wrapper { position: relative; }
     .search-input {
       width: 100%; padding: 13px 16px;
-      background: #0f0f1a; border: 1px solid #252540; border-radius: 10px;
+      background: #0f0f1a; border: 1px solid #3d3d68; border-radius: 10px;
       color: #e8e8f0; font-size: 16px; outline: none;
       transition: border-color 0.2s; -webkit-appearance: none;
     }
     .search-input:focus { border-color: #6366f1; }
-    .search-input::placeholder { color: #374151; }
+    .search-input::placeholder { color: #6b7280; }
 
     .dropdown {
       position: absolute; top: calc(100% + 4px); left: 0; right: 0;
-      background: #1e1e38; border: 1px solid #252540; border-radius: 10px;
+      background: #1e1e38; border: 1px solid #3d3d68; border-radius: 10px;
       max-height: 210px; overflow-y: auto; z-index: 200; display: none;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
@@ -74,8 +74,8 @@
     }
     .dropdown-item:last-child { border-bottom: none; }
     .dropdown-item:hover { background: #252545; }
-    .dropdown-item .emp-id { font-size: 11px; color: #4b5563; margin-top: 2px; }
-    .dropdown-empty { padding: 16px; text-align: center; color: #4b5563; font-size: 13px; }
+    .dropdown-item .emp-id { font-size: 11px; color: #a8b0c3; margin-top: 2px; }
+    .dropdown-empty { padding: 16px; text-align: center; color: #a8b0c3; font-size: 13px; }
 
     .empleado-confirmado {
       display: none; align-items: center; gap: 12px;
@@ -83,8 +83,8 @@
       border: 1px solid #1e3a1e; border-radius: 10px; margin-top: 10px;
     }
     .empleado-confirmado.visible { display: flex; }
-    .emp-nombre   { font-size: 15px; font-weight: 500; color: #e8e8f0; }
-    .emp-id-small { font-size: 11px; color: #4b5563; }
+    .emp-nombre   { font-size: 15px; font-weight: 700; color: #ffffff; }
+    .emp-id-small { font-size: 11px; color: #a8b0c3; }
     .check-emp {
       width: 20px; height: 20px; background: #166534; border-radius: 50%;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
@@ -92,20 +92,20 @@
     .check-emp svg { width: 11px; height: 11px; }
     .btn-cambiar {
       margin-left: auto; background: none; border: none;
-      color: #6b7280; font-size: 12px; cursor: pointer;
+      color: #b7bed0; font-size: 12px; cursor: pointer;
       padding: 4px 8px; border-radius: 6px;
     }
     .btn-cambiar:hover { background: #252540; color: #e8e8f0; }
 
     /* ── Turno ── */
-    .turno-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .turno-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
     .btn-turno {
-      padding: 14px 10px; background: #0f0f1a;
-      border: 1.5px solid #252540; border-radius: 10px;
-      color: #6b7280; font-size: 13px; font-weight: 500;
+      padding: 12px 6px; background: #0f0f1a;
+      border: 1.5px solid #3d3d68; border-radius: 10px;
+      color: #b7bed0; font-size: 12px; font-weight: 600;
       cursor: pointer; transition: all 0.15s; text-align: center; line-height: 1.3;
     }
-    .btn-turno .turno-horas { font-size: 11px; color: #374151; margin-top: 3px; }
+    .btn-turno .turno-horas { font-size: 10px; color: #8890a4; margin-top: 3px; font-weight: 500; }
     .btn-turno.selected { background: #1e1e40; border-color: #6366f1; color: #a5b4fc; }
     .btn-turno.selected .turno-horas { color: #6366f1; }
 
@@ -113,12 +113,12 @@
     .edificio-badge {
       display: flex; align-items: center; gap: 12px;
       padding: 13px 16px; background: #0f0f1a;
-      border: 1px solid #252540; border-radius: 10px;
+      border: 1px solid #3d3d68; border-radius: 10px;
       font-size: 14px; min-height: 56px; transition: border-color 0.3s;
     }
     .edificio-badge.detectado { border-color: #166534; }
     .edificio-badge.fuera     { border-color: #7f1d1d; }
-    .edificio-badge.cargando  { border-color: #252540; }
+    .edificio-badge.cargando  { border-color: #3d3d68; }
     .gps-dot {
       width: 10px; height: 10px; border-radius: 50%;
       background: #374151; flex-shrink: 0; transition: background 0.3s;
@@ -127,9 +127,9 @@
     .edificio-badge.fuera     .gps-dot { background: #ef4444; }
     .edificio-badge.cargando  .gps-dot { background: #f59e0b; animation: pulse 1.2s infinite; }
     .edificio-info { flex: 1; min-width: 0; }
-    .edificio-nombre { font-size: 14px; color: #e8e8f0; }
-    .edificio-sub    { font-size: 11px; color: #4b5563; margin-top: 2px; }
-    .gps-precision   { font-size: 11px; color: #374151; white-space: nowrap; }
+    .edificio-nombre { font-size: 14px; color: #ffffff; font-weight: 600; }
+    .edificio-sub    { font-size: 11px; color: #a8b0c3; margin-top: 2px; }
+    .gps-precision   { font-size: 11px; color: #8890a4; white-space: nowrap; }
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
 
     .btn-cambiar-edificio {
@@ -146,12 +146,12 @@
     .btn-edificio-opcion {
       display: flex; align-items: center; justify-content: space-between;
       padding: 13px 16px; background: #0f0f1a;
-      border: 1.5px solid #252540; border-radius: 10px;
+      border: 1.5px solid #3d3d68; border-radius: 10px;
       color: #e8e8f0; font-size: 14px; text-align: left;
       cursor: pointer; transition: all 0.15s;
     }
     .btn-edificio-opcion:hover, .btn-edificio-opcion:active { border-color: #6366f1; background: #1a1a30; }
-    .btn-edificio-opcion .opcion-dist { font-size: 11px; color: #4b5563; white-space: nowrap; margin-left: 10px; }
+    .btn-edificio-opcion .opcion-dist { font-size: 11px; color: #a8b0c3; white-space: nowrap; margin-left: 10px; }
 
     /* ── Cámara ── */
     .camara-wrapper {
@@ -163,7 +163,7 @@
       position: absolute; inset: 0; display: flex;
       align-items: center; justify-content: center;
       background: rgba(10,10,20,0.85); font-size: 13px;
-      color: #6b7280; text-align: center; padding: 20px; line-height: 1.6;
+      color: #b7bed0; text-align: center; padding: 20px; line-height: 1.6;
     }
     .camara-overlay.oculto { display: none; }
     .face-guide {
@@ -195,8 +195,8 @@
       padding: 14px 16px; border-radius: 10px; font-size: 14px;
       text-align: center; min-height: 50px; display: flex;
       align-items: center; justify-content: center;
-      background: #0f0f1a; border: 1px solid #252540;
-      color: #6b7280; line-height: 1.5; transition: color 0.2s, border-color 0.2s;
+      background: #0f0f1a; border: 1px solid #3d3d68;
+      color: #b7bed0; line-height: 1.5; transition: color 0.2s, border-color 0.2s;
     }
     #estado.ok      { color: #22c55e; border-color: #166534; }
     #estado.error   { color: #ef4444; border-color: #7f1d1d; }
@@ -226,7 +226,7 @@
     #offline-bar.visible { display: block; }
 
     .multi-turno-hint {
-      font-size: 11px; color: #374151; text-align: center;
+      font-size: 11px; color: #8890a4; text-align: center;
       margin-top: 10px; line-height: 1.5;
     }
 
@@ -244,7 +244,7 @@
       transform: translateY(30px); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
     }
     .modal-backdrop.visible .modal { transform: translateY(0); }
-    .modal-titulo { font-size: 11px; letter-spacing: 1.8px; color: #4b5563; text-transform: uppercase; margin-bottom: 16px; }
+    .modal-titulo { font-size: 11px; letter-spacing: 1.8px; color: #a8b0c3; text-transform: uppercase; margin-bottom: 16px; }
     .modal-evento-badge {
       display: flex; align-items: center; justify-content: center;
       padding: 18px; border-radius: 14px; margin-bottom: 16px;
@@ -255,16 +255,16 @@
     .modal-evento-badge.fin-com { background:#0c1a2e; color:#3b82f6; border:1.5px solid #1d4ed8; }
     .modal-evento-badge.salida  { background:#1c0505; color:#ef4444; border:1.5px solid #991b1b; }
     .modal-resumen {
-      background: #0f0f1a; border: 1px solid #252540; border-radius: 12px;
+      background: #0f0f1a; border: 1px solid #3d3d68; border-radius: 12px;
       padding: 14px 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px;
     }
     .resumen-fila { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; }
-    .resumen-label { color: #4b5563; font-size: 11px; }
-    .resumen-valor { color: #e8e8f0; font-weight: 500; text-align: right; max-width: 220px; }
+    .resumen-label { color: #a8b0c3; font-size: 11px; }
+    .resumen-valor { color: #ffffff; font-weight: 700; text-align: right; max-width: 220px; }
     .modal-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btn-modal-cancelar {
-      padding: 15px; border: 1.5px solid #252540; border-radius: 12px;
-      background: transparent; color: #6b7280; font-size: 15px; font-weight: 600;
+      padding: 15px; border: 1.5px solid #3d3d68; border-radius: 12px;
+      background: transparent; color: #b7bed0; font-size: 15px; font-weight: 600;
       cursor: pointer; transition: all 0.15s;
     }
     .btn-modal-cancelar:hover { background: #252540; color: #e8e8f0; }
@@ -279,7 +279,7 @@
     .btn-modal-confirmar.ini-com { background:#f59e0b; color:#1c0a00; }
     .btn-modal-confirmar.fin-com { background:#3b82f6; color:#e0f0ff; }
     .btn-modal-confirmar.salida  { background:#ef4444; color:#fff0f0; }
-    .modal-advertencia { font-size: 11px; color: #4b5563; text-align: center; margin-top: 12px; line-height: 1.5; }
+    .modal-advertencia { font-size: 11px; color: #a8b0c3; text-align: center; margin-top: 12px; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -331,8 +331,11 @@
     <button class="btn-turno" id="btn-mat" onclick="seleccionarTurno('Matutino')">
       Matutino<div class="turno-horas">7:00 – 15:00</div>
     </button>
+    <button class="btn-turno" id="btn-mix" onclick="seleccionarTurno('Mixto')">
+      Mixto<div class="turno-horas">7:00 – 17:00</div>
+    </button>
     <button class="btn-turno" id="btn-ves" onclick="seleccionarTurno('Vespertino')">
-      Vespertino<div class="turno-horas">14:00 – 22:00</div>
+      Vespertino<div class="turno-horas">13:00 – 21:00</div>
     </button>
   </div>
 </div>
@@ -448,7 +451,8 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxJYRYaJ36zlE5Fk2zGRuD_
 
 const TURNOS_UX = {
   "Matutino":   { entrada: "7:00",  salida: "15:00" },
-  "Vespertino": { entrada: "14:00", salida: "22:00" }
+  "Mixto":      { entrada: "7:00",  salida: "17:00" },
+  "Vespertino": { entrada: "13:00", salida: "21:00" }
 };
 
 const EVENTOS_CONFIG = {
@@ -616,6 +620,7 @@ function seleccionarTurno(turno) {
   turnoSeleccionado = turno;
   document.getElementById("turno_seleccionado").value = turno;
   document.getElementById("btn-mat").classList.toggle("selected", turno === "Matutino");
+  document.getElementById("btn-mix").classList.toggle("selected", turno === "Mixto");
   document.getElementById("btn-ves").classList.toggle("selected", turno === "Vespertino");
   const t = TURNOS_UX[turno];
   document.getElementById("hint-entrada").textContent = "Límite: " + t.entrada;
