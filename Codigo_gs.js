@@ -67,14 +67,44 @@ function doGet_Edificios(ss) {
 // adivinar cuál quiso el empleado solo con lat/lon.
 // ════════════════════════════════════════════════════════════════
 function doGet_Registro(ss, p) {
+  // ── Candado de concurrencia ─────────────────────────────────
+  // Evita que dos registros simultáneos (ej. hora pico de entrada)
+  // lean y escriban Sesiones_Activas al mismo tiempo y generen
+  // sesiones duplicadas o datos corruptos. Solo UNA ejecución a la
+  // vez puede estar dentro de este bloque; las demás esperan en fila.
+  var lock = LockService.getScriptLock();
+  var candadoObtenido = false;
+
   try {
+    candadoObtenido = lock.tryLock(10000); // espera hasta 10s por el candado
+    if (!candadoObtenido) {
+      return respuestaJSON({
+        status:  "ERROR",
+        mensaje: "El sistema está procesando otros registros en este momento. Intenta de nuevo en unos segundos."
+      });
+    }
+
     // 1. Validar empleado activo
     var empleado = buscarEmpleado(ss, p.id_empleado);
     if (!empleado) {
       return respuestaJSON({ status: "ERROR", mensaje: "Empleado no encontrado o inactivo." });
     }
 
-    // 2. Validar que el edificio elegido sea geográficamente válido
+    // 2. Validar turno y evento ANTES de tocar cualquier hoja —
+    //    si vienen vacíos, mal escritos o corruptos, se rechazan
+    //    aquí sin dejar rastros a medias en Log ni en sesiones.
+    var turno  = String(p.turno  || "").trim();
+    var evento = String(p.evento || "").trim();
+
+    if (Object.keys(TURNOS).indexOf(turno) === -1) {
+      return respuestaJSON({ status: "ERROR", mensaje: "Turno no válido: '" + turno + "'." });
+    }
+    var EVENTOS_VALIDOS = ["Entrada", "Inicio Comida", "Fin Comida", "Salida"];
+    if (EVENTOS_VALIDOS.indexOf(evento) === -1) {
+      return respuestaJSON({ status: "ERROR", mensaje: "Evento no válido: '" + evento + "'." });
+    }
+
+    // 3. Validar que el edificio elegido sea geográficamente válido
     var latitud  = parseFloat(p.latitud);
     var longitud = parseFloat(p.longitud);
     var edificio = validarEdificioSeleccionado(ss, p.id_edificio, latitud, longitud);
@@ -82,15 +112,13 @@ function doGet_Registro(ss, p) {
       return respuestaJSON({ status: "ERROR", mensaje: edificio.mensaje });
     }
 
-    var ahora  = new Date();
-    var fecha  = Utilities.formatDate(ahora, "America/Mexico_City", "yyyyMMdd");
-    var turno  = p.turno;
-    var evento = p.evento;
+    var ahora = new Date();
+    var fecha = Utilities.formatDate(ahora, "America/Mexico_City", "yyyyMMdd");
 
-    // 3. Resolver a qué sesión pertenece este evento
+    // 4. Resolver a qué sesión pertenece este evento
     var sesionInfo = resolverSesion(ss, empleado.id, turno, edificio, fecha, evento);
 
-    // 4. Guardar SIEMPRE en el Log crudo, con id_sesion incluido
+    // 5. Guardar SIEMPRE en el Log crudo, con id_sesion incluido
     var estatusLog = (evento === "Entrada" || evento === "Salida")
       ? calcularEstatus(turno, evento, ahora)
       : "—";
@@ -120,6 +148,12 @@ function doGet_Registro(ss, p) {
 
   } catch(err) {
     return respuestaJSON({ status: "ERROR", mensaje: "Error interno: " + err.toString() });
+
+  } finally {
+    // El candado SIEMPRE se libera, incluso si hubo error o return
+    // anticipado — de lo contrario, todas las peticiones siguientes
+    // se quedarían esperando un candado que nadie va a soltar.
+    if (candadoObtenido) lock.releaseLock();
   }
 }
 

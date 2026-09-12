@@ -671,7 +671,20 @@ function procesarGPS(lat, lon, precision) {
     edificioDetectado = null;
     document.getElementById("id_edificio").value = "";
     ocultarPicker();
-    setEdificio("fuera", "Fuera de área", "No hay ningún punto de registro cerca de tu ubicación.");
+
+    // Sin NFC como respaldo, decirle al empleado hacia dónde caminar
+    // es la única guía que tiene — por eso buscamos el más cercano
+    // AUNQUE esté fuera de rango, solo para mostrar la distancia.
+    let masCercanoFuera = null, distMinFuera = Infinity;
+    edificios.forEach(ed => {
+      const d = haversine(lat, lon, ed.lat, ed.lon);
+      if (d < distMinFuera) { distMinFuera = d; masCercanoFuera = ed; }
+    });
+
+    const sub = masCercanoFuera
+      ? "Más cercano: " + masCercanoFuera.nombre + " a " + Math.round(distMinFuera) + "m — acércate más"
+      : "No hay ningún punto de registro cerca de tu ubicación.";
+    setEdificio("fuera", "Fuera de área", sub);
 
   } else if (candidatosActuales.length === 1) {
     // Caso normal — un solo edificio en este punto, auto-selección
