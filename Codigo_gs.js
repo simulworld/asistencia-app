@@ -1,7 +1,13 @@
 // ════════════════════════════════════════════════════════════════
-// SISTEMA DE ASISTENCIA — Backend v5.0
-// Soporta múltiples "edificios" en las mismas coordenadas
-// (mismo punto físico, distintos clientes/pisos)
+// SISTEMA DE ASISTENCIA — Backend v7.0
+// - Múltiples "edificios" en las mismas coordenadas (mismo punto
+//   físico, distintos clientes/pisos)
+// - Candado de concurrencia (LockService) contra registros simultáneos
+// - Validación temprana de turno/evento
+// - Turnos: Matutino, Mixto, Vespertino
+// - Resumen_Turnos con horas de comida junto a hora_entrada/salida
+// - Respaldo automático diario a Drive con rotación de 30 días
+// - Alertas de error por correo + bitácora en hoja Errores_Sistema
 // ════════════════════════════════════════════════════════════════
 
 const SPREADSHEET_ID = "1w3g2SCyI6AWsGIyY5wL2HXnRimnWht8ohZHugIEEBsQ";
@@ -256,9 +262,14 @@ function manejarSalida(ss, empleado, edificio, turno, fecha, ahora, sesion) {
   var estatusEntrada = calcularEstatus(turno, "Entrada", horaEntrada);
   var estatusSalida  = calcularEstatus(turno, "Salida", ahora);
 
+  // Orden de columnas en Resumen_Turnos:
+  // A:id_sesion B:id_empleado C:nombre D:fecha E:edificio F:turno
+  // G:hora_entrada H:hora_salida I:hora_inicio_comida J:hora_fin_comida
+  // K:horas_comida L:horas_trabajadas M:estatus_entrada N:estatus_salida
   ss.getSheetByName("Resumen_Turnos").appendRow([
     sesion.datos[0], empleado.id, empleado.nombre, fecha,
     edificio.nombre, turno, horaEntrada, ahora,
+    horaIniCom || "", horaFinCom || "",
     horasComida, horasTrabajadas, estatusEntrada, estatusSalida
   ]);
 
@@ -398,9 +409,9 @@ function enviarReporteSemanal() {
   });
 
   var totalEmpleados = new Set(filas.map(function(f) { return f[1]; })).size;
-  var totalHoras      = filas.reduce(function(sum, f) { return sum + (parseFloat(f[9]) || 0); }, 0);
-  var retardos         = filas.filter(function(f) { return String(f[10]).startsWith("Retardo"); }).length;
-  var anticipadas      = filas.filter(function(f) { return String(f[11]).startsWith("Salida anticipada"); }).length;
+  var totalHoras      = filas.reduce(function(sum, f) { return sum + (parseFloat(f[11]) || 0); }, 0);
+  var retardos         = filas.filter(function(f) { return String(f[12]).startsWith("Retardo"); }).length;
+  var anticipadas      = filas.filter(function(f) { return String(f[13]).startsWith("Salida anticipada"); }).length;
 
   var resumen =
     "Reporte de asistencia — últimos 7 días\n" +
@@ -413,8 +424,8 @@ function enviarReporteSemanal() {
     "Se adjunta el detalle completo en CSV.\n";
 
   var enc = ["ID Sesión","ID Empleado","Nombre","Fecha","Edificio","Turno",
-             "Hora Entrada","Hora Salida","Horas Comida","Horas Trabajadas",
-             "Estatus Entrada","Estatus Salida"];
+             "Hora Entrada","Hora Salida","Hora Inicio Comida","Hora Fin Comida",
+             "Horas Comida","Horas Trabajadas","Estatus Entrada","Estatus Salida"];
   var csv = enc.join(",") + "\n";
   filas.forEach(function(f) {
     csv += f.map(function(c) {
@@ -501,4 +512,122 @@ function diagnosticarEmpleado() {
   for (var i = 1; i < datos.length; i++) {
     Logger.log("Fila " + (i+1) + ": ID='" + datos[i][0] + "' Nombre='" + datos[i][1] + "' Activo=" + datos[i][2]);
   }
+}
+
+// ════════════════════════════════════════════════════════════════
+// RESPALDO AUTOMÁTICO DIARIO
+// Crea una copia completa del archivo cada noche en una carpeta
+// de Drive, y elimina automáticamente las copias de más de 30 días
+// para que el espacio no crezca indefinidamente.
+// ════════════════════════════════════════════════════════════════
+const NOMBRE_CARPETA_RESPALDOS = "Respaldos_Sistema_Asistencia";
+const DIAS_A_CONSERVAR_RESPALDOS = 30;
+
+function crearRespaldoDiario() {
+  var archivoOriginal = DriveApp.getFileById(SPREADSHEET_ID);
+  var carpeta = obtenerOCrearCarpetaRespaldos(NOMBRE_CARPETA_RESPALDOS);
+
+  var fechaStr = Utilities.formatDate(new Date(), "America/Mexico_City", "yyyy-MM-dd");
+  archivoOriginal.makeCopy("Respaldo_Asistencia_" + fechaStr, carpeta);
+
+  limpiarRespaldosViejos(carpeta, DIAS_A_CONSERVAR_RESPALDOS);
+}
+
+function obtenerOCrearCarpetaRespaldos(nombre) {
+  var carpetas = DriveApp.getFoldersByName(nombre);
+  if (carpetas.hasNext()) return carpetas.next();
+  return DriveApp.createFolder(nombre);
+}
+
+function limpiarRespaldosViejos(carpeta, diasAConservar) {
+  var limite   = new Date(Date.now() - diasAConservar * 24 * 60 * 60 * 1000);
+  var archivos = carpeta.getFiles();
+  while (archivos.hasNext()) {
+    var archivo = archivos.next();
+    if (archivo.getDateCreated() < limite) {
+      archivo.setTrashed(true); // va a la papelera de Drive, no se borra permanente de inmediato
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// SISTEMA DE ALERTAS DE ERROR
+// Envuelve cualquier función automática: si truena, avisa por correo
+// Y deja un registro permanente en la hoja "Errores_Sistema" — así
+// un correo perdido entre otros mensajes no es la única forma de
+// enterarte de que algo falló.
+// ════════════════════════════════════════════════════════════════
+function ejecutarConAlerta(nombreFuncion, funcion) {
+  try {
+    funcion();
+  } catch(err) {
+    registrarError(nombreFuncion, err);
+    enviarAlertaError(nombreFuncion, err);
+  }
+}
+
+function registrarError(nombreFuncion, err) {
+  try {
+    var ss   = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var hoja = ss.getSheetByName("Errores_Sistema");
+    if (hoja) {
+      hoja.appendRow([
+        new Date(), nombreFuncion, err.toString(), err.stack || ""
+      ]);
+    }
+  } catch(e2) {
+    // Si ni siquiera esto funciona, no hay más remedio que dejarlo pasar —
+    // el correo de abajo sigue siendo el respaldo final.
+  }
+}
+
+function enviarAlertaError(nombreFuncion, err) {
+  try {
+    GmailApp.sendEmail(
+      CORREOS_REPORTE,
+      "⚠️ Error en el Sistema de Asistencia — " + nombreFuncion,
+      "La función '" + nombreFuncion + "' falló con el siguiente error:\n\n" +
+      err.toString() + "\n\n" +
+      "Hora: " + new Date().toLocaleString("es-MX") + "\n\n" +
+      "Revisa la hoja 'Errores_Sistema' para el detalle completo, o el editor de Apps Script para depurar."
+    );
+  } catch(e2) {
+    // Último recurso — si hasta el correo falla, no hay más que hacer desde aquí.
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// FUNCIONES DE ACTIVADOR (TRIGGERS)
+// Estas son las que debes seleccionar en "Activadores" — nunca
+// selecciones directamente enviarReporteSemanal, revisarSesiones-
+// Abandonadas ni crearRespaldoDiario, porque entonces un error ahí
+// no generaría ninguna alerta.
+// ════════════════════════════════════════════════════════════════
+function trigger_ReporteSemanal() {
+  ejecutarConAlerta("enviarReporteSemanal", enviarReporteSemanal);
+}
+
+function trigger_SesionesAbandonadas() {
+  ejecutarConAlerta("revisarSesionesAbandonadas", revisarSesionesAbandonadas);
+}
+
+function trigger_RespaldoDiario() {
+  ejecutarConAlerta("crearRespaldoDiario", crearRespaldoDiario);
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRUEBAS DE LAS NUEVAS FUNCIONES
+// ════════════════════════════════════════════════════════════════
+function probarRespaldoManual() {
+  crearRespaldoDiario();
+  Logger.log("Respaldo creado. Revisa tu Drive — carpeta '" + NOMBRE_CARPETA_RESPALDOS + "'.");
+}
+
+function probarAlertaError() {
+  // Simula una función que truena a propósito, para confirmar que
+  // el correo de alerta y el registro en Errores_Sistema funcionan.
+  ejecutarConAlerta("funcionDePrueba", function() {
+    throw new Error("Este es un error de prueba — todo funciona si recibiste el correo.");
+  });
+  Logger.log("Revisa tu correo y la hoja Errores_Sistema.");
 }
