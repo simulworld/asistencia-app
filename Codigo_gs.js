@@ -21,8 +21,16 @@ const CORREOS_REPORTE = [
 const TURNOS = {
   "Matutino":   { entrada: { h: 7,  m: 0 }, salida: { h: 15, m: 0 }, tolerancia_min: 10 },
   "Mixto":      { entrada: { h: 7,  m: 0 }, salida: { h: 17, m: 0 }, tolerancia_min: 10 },
-  "Vespertino": { entrada: { h: 13, m: 0 }, salida: { h: 21, m: 0 }, tolerancia_min: 10 }
+  "Vespertino": { entrada: { h: 13, m: 0 }, salida: { h: 21, m: 0 }, tolerancia_min: 10 },
+  // Sin horario fijo: para empleados con base "COMODIN" que atienden
+  // más de un servicio/edificio al día. Nunca genera retardos ni
+  // salidas anticipadas — solo registra la hora, sin evaluarla.
+  "Comodín":    { sinHorario: true }
 };
+
+// Nombre EXACTO (mayúsculas) que debe tener la columna "base" en la
+// hoja Empleados para que un empleado pueda usar el turno Comodín.
+const VALOR_BASE_COMODIN = "COMODIN";
 
 // ════════════════════════════════════════════════════════════════
 // doGet — maneja catálogos y registros
@@ -39,14 +47,38 @@ function doGet(e) {
 }
 
 function doGet_Empleados(ss) {
-  var datos     = ss.getSheetByName("Empleados").getDataRange().getValues();
+  var hoja    = ss.getSheetByName("Empleados");
+  var datos   = hoja.getDataRange().getValues();
+  var headers = datos[0];
+  // Se busca la columna "base" por NOMBRE, no por posición fija —
+  // así no importa si en el futuro se agregan o reordenan columnas
+  // entre id_empleado/nombre/activo y "base".
+  var idxBase = idxColumnaPorNombre(headers, "base");
+
   var empleados = [];
   for (var i = 1; i < datos.length; i++) {
     if (datos[i][2] === true) {
-      empleados.push({ id: String(datos[i][0]), nombre: String(datos[i][1]) });
+      var valorBase = (idxBase !== -1) ? String(datos[i][idxBase] || "").trim().toUpperCase() : "";
+      empleados.push({
+        id:      String(datos[i][0]),
+        nombre:  String(datos[i][1]),
+        comodin: valorBase === VALOR_BASE_COMODIN
+      });
     }
   }
   return respuestaJSON(empleados);
+}
+
+// Busca el índice (0-based) de una columna por su encabezado,
+// sin importar mayúsculas/minúsculas ni espacios extra. Regresa -1
+// si no la encuentra.
+function idxColumnaPorNombre(headers, nombreBuscado) {
+  for (var i = 0; i < headers.length; i++) {
+    if (String(headers[i]).trim().toLowerCase() === nombreBuscado.toLowerCase()) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 function doGet_Edificios(ss) {
@@ -108,6 +140,18 @@ function doGet_Registro(ss, p) {
     var EVENTOS_VALIDOS = ["Entrada", "Inicio Comida", "Fin Comida", "Salida"];
     if (EVENTOS_VALIDOS.indexOf(evento) === -1) {
       return respuestaJSON({ status: "ERROR", mensaje: "Evento no válido: '" + evento + "'." });
+    }
+
+    // 2.5 El turno "Comodín" solo lo puede usar un empleado cuya columna
+    //     'base' en la hoja Empleados tenga el valor "COMODIN". Esta
+    //     validación es del lado del servidor a propósito — que la app
+    //     oculte el botón para quien no es elegible es solo comodidad de
+    //     interfaz, no seguridad; esta línea es la que realmente protege.
+    if (turno === "Comodín" && !empleado.comodin) {
+      return respuestaJSON({
+        status:  "ERROR",
+        mensaje: "El turno Comodín no está disponible para tu perfil. Contacta a tu supervisor si esto es un error."
+      });
     }
 
     // 3. Validar que el edificio elegido sea geográficamente válido
@@ -317,10 +361,18 @@ function contarSesionesCerradasHoy(ss, idEmpleado, turno, nombreEdificio, fecha)
 // Helpers generales
 // ════════════════════════════════════════════════════════════════
 function buscarEmpleado(ss, id) {
-  var datos = ss.getSheetByName("Empleados").getDataRange().getValues();
+  var datos   = ss.getSheetByName("Empleados").getDataRange().getValues();
+  var headers = datos[0];
+  var idxBase = idxColumnaPorNombre(headers, "base");
+
   for (var i = 1; i < datos.length; i++) {
     if (String(datos[i][0]) === String(id) && datos[i][2] === true) {
-      return { id: datos[i][0], nombre: datos[i][1] };
+      var valorBase = (idxBase !== -1) ? String(datos[i][idxBase] || "").trim().toUpperCase() : "";
+      return {
+        id:      datos[i][0],
+        nombre:  datos[i][1],
+        comodin: valorBase === VALOR_BASE_COMODIN
+      };
     }
   }
   return null;
@@ -339,6 +391,10 @@ function haversine(lat1, lon1, lat2, lon2) {
 function calcularEstatus(turno, evento, momento) {
   var regla = TURNOS[turno];
   if (!regla) return "Turno desconocido";
+
+  // Turnos sin horario fijo (Comodín) — nunca se evalúa puntualidad,
+  // solo se registra la hora tal cual.
+  if (regla.sinHorario) return "—";
 
   var limiteEntrada = new Date(momento);
   limiteEntrada.setHours(regla.entrada.h, regla.entrada.m + regla.tolerancia_min, 0, 0);

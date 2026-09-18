@@ -337,6 +337,9 @@
     <button class="btn-turno" id="btn-ves" onclick="seleccionarTurno('Vespertino')">
       Vespertino<div class="turno-horas">13:00 – 21:00</div>
     </button>
+    <button class="btn-turno" id="btn-com" onclick="seleccionarTurno('Comodín')" style="display:none">
+      Comodín<div class="turno-horas">Sin horario fijo</div>
+    </button>
   </div>
 </div>
 
@@ -452,7 +455,8 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxJYRYaJ36zlE5Fk2zGRuD_
 const TURNOS_UX = {
   "Matutino":   { entrada: "7:00",  salida: "15:00" },
   "Mixto":      { entrada: "7:00",  salida: "17:00" },
-  "Vespertino": { entrada: "13:00", salida: "21:00" }
+  "Vespertino": { entrada: "13:00", salida: "21:00" },
+  "Comodín":    { entrada: "Flexible", salida: "Flexible" } // sin horario fijo — solo informativo
 };
 
 const EVENTOS_CONFIG = {
@@ -593,14 +597,18 @@ function abrirDropdown()  { document.getElementById("dropdown").classList.add("o
 function cerrarDropdown() { document.getElementById("dropdown").classList.remove("open"); }
 
 function seleccionarEmpleado(id, nombreEncoded) {
-  const nombre = decodeURIComponent(nombreEncoded);
-  empleadoSeleccionado = { id, nombre };
+  const nombre  = decodeURIComponent(nombreEncoded);
+  // Se busca el registro completo en el catálogo para saber si este
+  // empleado tiene habilitado el turno Comodín (columna 'base' = COMODIN).
+  const registro = empleados.find(e => e.id === id);
+  empleadoSeleccionado = { id, nombre, comodin: !!(registro && registro.comodin) };
   document.getElementById("id_empleado").value = id;
   document.getElementById("search-wrapper").style.display = "none";
   document.getElementById("empleado-confirmado").classList.add("visible");
   document.getElementById("emp-nombre-display").textContent = nombre;
   document.getElementById("emp-id-display").textContent     = id;
   cerrarDropdown();
+  actualizarOpcionesTurno();
   actualizarChecklist();
 }
 
@@ -610,21 +618,49 @@ function resetEmpleado() {
   document.getElementById("busqueda").value    = "";
   document.getElementById("search-wrapper").style.display = "";
   document.getElementById("empleado-confirmado").classList.remove("visible");
+  actualizarOpcionesTurno();
   actualizarChecklist();
 }
 
 // ══════════════════════════════════════════════════════════════
 // TURNO
 // ══════════════════════════════════════════════════════════════
+
+// Muestra el botón "Comodín" solo si el empleado seleccionado tiene
+// base = COMODIN. Si el empleado cambia y ya no es elegible pero
+// había quedado seleccionado ese turno, se limpia la selección para
+// forzar que se elija un turno válido de nuevo.
+function actualizarOpcionesTurno() {
+  const elegible = !!(empleadoSeleccionado && empleadoSeleccionado.comodin);
+  const btnCom   = document.getElementById("btn-com");
+  btnCom.style.display = elegible ? "block" : "none";
+
+  if (!elegible && turnoSeleccionado === "Comodín") {
+    turnoSeleccionado = null;
+    document.getElementById("turno_seleccionado").value = "";
+    btnCom.classList.remove("selected");
+    document.getElementById("hint-entrada").textContent = "";
+    document.getElementById("hint-salida").textContent  = "";
+  }
+}
+
 function seleccionarTurno(turno) {
   turnoSeleccionado = turno;
   document.getElementById("turno_seleccionado").value = turno;
   document.getElementById("btn-mat").classList.toggle("selected", turno === "Matutino");
   document.getElementById("btn-mix").classList.toggle("selected", turno === "Mixto");
   document.getElementById("btn-ves").classList.toggle("selected", turno === "Vespertino");
-  const t = TURNOS_UX[turno];
-  document.getElementById("hint-entrada").textContent = "Límite: " + t.entrada;
-  document.getElementById("hint-salida").textContent  = "Hora: "   + t.salida;
+  document.getElementById("btn-com").classList.toggle("selected", turno === "Comodín");
+
+  if (turno === "Comodín") {
+    // Sin horario fijo — no hay límite de entrada ni hora de salida que mostrar
+    document.getElementById("hint-entrada").textContent = "Sin horario fijo";
+    document.getElementById("hint-salida").textContent  = "";
+  } else {
+    const t = TURNOS_UX[turno];
+    document.getElementById("hint-entrada").textContent = "Límite: " + t.entrada;
+    document.getElementById("hint-salida").textContent  = "Hora: "   + t.salida;
+  }
   actualizarChecklist();
 }
 
