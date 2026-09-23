@@ -451,6 +451,7 @@
 // ⚠ ÚNICA LÍNEA QUE DEBES EDITAR:
 const API_URL = "https://script.google.com/macros/s/AKfycbxJYRYaJ36zlE5Fk2zGRuD_VygvMwF59VcCawL__pVHo5E3QjzAjj4IYvnehKuBJVbtpw/exec";
 // ══════════════════════════════════════════════════════════════
+const VERSION_FRONTEND = "9.0";
 
 const TURNOS_UX = {
   "Matutino":   { entrada: "7:00",  salida: "15:00" },
@@ -510,6 +511,11 @@ function iniciarReloj() {
 // ══════════════════════════════════════════════════════════════
 async function cargarCatalogos() {
   document.getElementById("card-aviso-catalogo").style.display = "none";
+  empleados = [];
+  // Migración de privacidad: versiones anteriores podían conservar el padrón
+  // de empleados en localStorage. Lo eliminamos al actualizar a v9.
+  try { localStorage.removeItem("cache_empleados"); } catch(e) {}
+
   try {
     const ctrl  = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 8000);
@@ -522,31 +528,39 @@ async function cargarCatalogos() {
     const empData = await resEmp.json();
     const ediData = await resEdi.json();
     if (!Array.isArray(empData) || !Array.isArray(ediData)) throw new Error("Formato inesperado");
+
+    // El catálogo de empleados se mantiene SOLO en memoria de esta página.
+    // Nunca se persiste en localStorage.
     empleados = empData;
     edificios = ediData;
-    localStorage.setItem("cache_empleados", JSON.stringify(empleados));
-    localStorage.setItem("cache_edificios",  JSON.stringify(edificios));
+    localStorage.setItem("cache_edificios", JSON.stringify(edificios));
     setEstado("Catálogos cargados. Selecciona tu nombre para comenzar.", "");
-    return;
+    return true;
   } catch(e) {
     console.warn("Servidor no disponible:", e.message);
   }
-  const cE = localStorage.getItem("cache_empleados");
+
+  // Los edificios no son datos de empleados y pueden permanecer en caché
+  // para que un edificio con mala señal siga siendo utilizable tras haber
+  // cargado la aplicación previamente. El catálogo de empleados NO se cachea.
   const cD = localStorage.getItem("cache_edificios");
-  if (cE) empleados = JSON.parse(cE);
-  if (cD) edificios = JSON.parse(cD);
-  if (empleados.length && edificios.length) {
-    setEstado("⚠ Usando datos en caché. Los catálogos pueden no estar al día.", "aviso");
-  } else {
-    document.getElementById("card-aviso-catalogo").style.display = "block";
-    setEstado("Sin conexión al servidor y sin datos en caché.", "error");
+  if (cD) {
+    try { edificios = JSON.parse(cD); } catch(e) { edificios = []; }
   }
+
+  document.getElementById("card-aviso-catalogo").style.display = "block";
+  if (edificios.length) {
+    setEstado("Sin conexión al servidor. Recupera señal para cargar la lista de empleados.", "aviso");
+  } else {
+    setEstado("Sin conexión al servidor y sin datos de edificios en caché.", "error");
+  }
+  return false;
 }
 
 async function reintentarCatalogos() {
   setEstado("Reintentando conexión...", "cargando");
-  await cargarCatalogos();
-  if (empleados.length) renderDropdown(empleados);
+  const ok = await cargarCatalogos();
+  if (ok && empleados.length) renderDropdown(empleados);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -598,15 +612,21 @@ function cerrarDropdown() { document.getElementById("dropdown").classList.remove
 
 function seleccionarEmpleado(id, nombreEncoded) {
   const nombre  = decodeURIComponent(nombreEncoded);
-  // Se busca el registro completo en el catálogo para saber si este
-  // empleado tiene habilitado el turno Comodín (columna 'base' = COMODIN).
-  const registro = empleados.find(e => e.id === id);
-  empleadoSeleccionado = { id, nombre, comodin: !!(registro && registro.comodin) };
-  document.getElementById("id_empleado").value = id;
+  const registro = empleados.find(e => String(e.id) === String(id));
+
+  // El nombre visible proviene del catálogo oficial; el ID es el identificador
+  // técnico que el servidor volverá a validar.
+  empleadoSeleccionado = {
+    id: String(id),
+    nombre: nombre,
+    comodin: !!(registro && registro.comodin)
+  };
+
+  document.getElementById("id_empleado").value = empleadoSeleccionado.id;
   document.getElementById("search-wrapper").style.display = "none";
   document.getElementById("empleado-confirmado").classList.add("visible");
-  document.getElementById("emp-nombre-display").textContent = nombre;
-  document.getElementById("emp-id-display").textContent     = id;
+  document.getElementById("emp-nombre-display").textContent = empleadoSeleccionado.nombre;
+  document.getElementById("emp-id-display").textContent     = empleadoSeleccionado.id;
   cerrarDropdown();
   actualizarOpcionesTurno();
   actualizarChecklist();
@@ -614,10 +634,15 @@ function seleccionarEmpleado(id, nombreEncoded) {
 
 function resetEmpleado() {
   empleadoSeleccionado = null;
+  turnoSeleccionado = null;
   document.getElementById("id_empleado").value = "";
-  document.getElementById("busqueda").value    = "";
+  document.getElementById("turno_seleccionado").value = "";
+  document.getElementById("busqueda").value = "";
   document.getElementById("search-wrapper").style.display = "";
   document.getElementById("empleado-confirmado").classList.remove("visible");
+  ["btn-mat","btn-mix","btn-ves","btn-com"].forEach(id => document.getElementById(id).classList.remove("selected"));
+  document.getElementById("hint-entrada").textContent = "";
+  document.getElementById("hint-salida").textContent = "";
   actualizarOpcionesTurno();
   actualizarChecklist();
 }
@@ -902,26 +927,39 @@ async function confirmarRegistro() {
   setEstado("Enviando registro...", "cargando");
   deshabilitarBotones(true);
 
+  const ahoraCliente = new Date();
+  const sinConexionInicial = !navigator.onLine;
   const payload = {
     id_empleado: empleadoSeleccionado.id,
-    nombre:      empleadoSeleccionado.nombre,
     id_edificio: edificioDetectado.id,
     turno:       turnoSeleccionado,
     evento:      evento,
     latitud:     gpsActual ? gpsActual.lat       : null,
     longitud:    gpsActual ? gpsActual.lon       : null,
-    precision:   gpsActual ? gpsActual.precision : null
+    precision:   gpsActual ? gpsActual.precision : null,
+    ts_cliente:  ahoraCliente.toISOString(),
+    id_evento:   generarIdEvento(),
+    origen:      sinConexionInicial ? "OFFLINE" : "ONLINE"
   };
 
-  if (navigator.onLine) {
-    await enviarRegistro(payload);
-  } else {
-    guardarEnCola(payload);
+  // Guardamos primero y borramos de la cola sólo después de recibir una
+  // respuesta exitosa. Así, si la red falla justo después de que el servidor
+  // procesó el evento, el mismo id_evento permite reintentarlo sin duplicarlo.
+  guardarEnCola(payload);
+
+  if (sinConexionInicial) {
     setEstado("Sin conexión. Registro guardado — se enviará al recuperar señal.", "aviso");
+  } else {
+    await enviarRegistro(payload);
   }
 
   enviando = false;
   deshabilitarBotones(false);
+}
+
+function generarIdEvento() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return "EVT-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -931,52 +969,116 @@ function construirParams(payload) {
   return new URLSearchParams({
     accion:      "registro",
     id_empleado: payload.id_empleado,
-    nombre:      payload.nombre,
     id_edificio: payload.id_edificio,
     turno:       payload.turno,
     evento:      payload.evento,
     latitud:     payload.latitud   !== null ? payload.latitud   : "",
     longitud:    payload.longitud  !== null ? payload.longitud  : "",
-    precision:   payload.precision !== null ? payload.precision : ""
+    precision:   payload.precision !== null ? payload.precision : "",
+    ts_cliente:  payload.ts_cliente || "",
+    id_evento:   payload.id_evento || "",
+    origen:      payload.origen || "ONLINE"
   });
 }
 
 async function enviarRegistro(payload) {
   try {
-    const res  = await fetch(API_URL + "?" + construirParams(payload).toString());
+    // GET se mantiene deliberadamente: en este proyecto evita introducir el
+    // problema de CORS/redirecciones que ya se observó con POST hacia Apps Script.
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12000);
+    const res  = await fetch(API_URL + "?" + construirParams(payload).toString(), { signal: ctrl.signal });
+    clearTimeout(timer);
+
     const data = await res.json();
     if (data.status === "OK") {
+      eliminarDeCola(payload.id_evento);
       setEstado("✓ " + data.mensaje, "ok");
-    } else {
-      setEstado("✗ " + data.mensaje, "error");
+      return true;
     }
+
+    if (data.reintentar === false) {
+      // Es un rechazo definitivo (GPS, sesión, turno, etc.): no debe quedar
+      // reintentándose indefinidamente. El servidor ya dejó la bitácora.
+      eliminarDeCola(payload.id_evento);
+      setEstado("✗ " + data.mensaje, "error");
+      return false;
+    }
+
+    setEstado("⚠ Registro pendiente. Se reintentará automáticamente.", "aviso");
+    return false;
+
   } catch(e) {
-    guardarEnCola(payload);
-    setEstado("Error de red. Registro guardado para reintento automático.", "aviso");
+    // Esto cubre tanto pérdida real de internet como problemas de acceso al
+    // endpoint, timeout, respuesta no legible, etc. No asumimos que
+    // navigator.onLine == true significa que el servidor es accesible.
+    const cola = JSON.parse(localStorage.getItem("cola_offline") || "[]");
+    const idx = cola.findIndex(item => item.payload && item.payload.id_evento === payload.id_evento);
+    if (idx >= 0) {
+      cola[idx].payload.origen = payload.origen === "OFFLINE" ? "OFFLINE" : "REINTENTO";
+      localStorage.setItem("cola_offline", JSON.stringify(cola));
+    }
+    setEstado("Error de comunicación. El registro quedó guardado para reintento automático.", "aviso");
+    return false;
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// COLA OFFLINE
-// ══════════════════════════════════════════════════════════════
 function guardarEnCola(payload) {
   const cola = JSON.parse(localStorage.getItem("cola_offline") || "[]");
-  cola.push({ payload, ts_local: Date.now() });
-  localStorage.setItem("cola_offline", JSON.stringify(cola));
+  if (!cola.some(item => item.payload && item.payload.id_evento === payload.id_evento)) {
+    cola.push({ payload: payload, guardado: Date.now() });
+    localStorage.setItem("cola_offline", JSON.stringify(cola));
+  }
+}
+
+function eliminarDeCola(idEvento) {
+  if (!idEvento) return;
+  const cola = JSON.parse(localStorage.getItem("cola_offline") || "[]");
+  const pendientes = cola.filter(item => !item.payload || item.payload.id_evento !== idEvento);
+  localStorage.setItem("cola_offline", JSON.stringify(pendientes));
+}
+
+function normalizarItemCola(item) {
+  if (!item.payload) item.payload = {};
+  if (!item.payload.id_evento) item.payload.id_evento = generarIdEvento();
+  if (!item.payload.ts_cliente) {
+    const base = item.guardado || item.ts_local || Date.now();
+    item.payload.ts_cliente = new Date(base).toISOString();
+  }
+  if (!item.payload.origen || item.payload.origen === "ONLINE") item.payload.origen = "OFFLINE";
+  delete item.payload.nombre;
+  return item.payload;
 }
 
 async function procesarCola() {
   const cola = JSON.parse(localStorage.getItem("cola_offline") || "[]");
-  if (!cola.length) return;
-  const pendientes = [];
-  for (const item of cola) {
+  if (!cola.length || !navigator.onLine) return;
+
+  for (const item of cola.slice()) {
+    const payload = normalizarItemCola(item);
+    localStorage.setItem("cola_offline", JSON.stringify(cola));
+
     try {
-      const res  = await fetch(API_URL + "?" + construirParams(item.payload).toString());
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 12000);
+      const res = await fetch(API_URL + "?" + construirParams(payload).toString(), { signal: ctrl.signal });
+      clearTimeout(timer);
       const data = await res.json();
-      if (data.status !== "OK") pendientes.push(item);
-    } catch(e) { pendientes.push(item); }
+
+      if (data.status === "OK" || data.reintentar === false) {
+        eliminarDeCola(payload.id_evento);
+      } else {
+        break;
+      }
+    } catch(e) {
+      break;
+    }
   }
-  localStorage.setItem("cola_offline", JSON.stringify(pendientes));
+
+  const restantes = JSON.parse(localStorage.getItem("cola_offline") || "[]");
+  if (restantes.length) {
+    setEstado("⚠ Hay " + restantes.length + " registro(s) pendiente(s) de sincronización.", "aviso");
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -984,9 +1086,13 @@ async function procesarCola() {
 // ══════════════════════════════════════════════════════════════
 function escucharConectividad() {
   const bar = document.getElementById("offline-bar");
-  window.addEventListener("online",  () => { bar.classList.remove("visible"); procesarCola(); });
+  window.addEventListener("online", async () => {
+    bar.classList.remove("visible");
+    await procesarCola();
+  });
   window.addEventListener("offline", () => bar.classList.add("visible"));
   if (!navigator.onLine) bar.classList.add("visible");
+  else procesarCola();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1011,6 +1117,7 @@ function setEstado(msg, tipo) {
 }
 
 // ══════════════════════════════════════════════════════════════
+console.info("Sistema de Asistencia Frontend v" + VERSION_FRONTEND);
 inicializar();
 </script>
 </body>
